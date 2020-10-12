@@ -1,0 +1,232 @@
+﻿<Page
+    x:Class="GeometrySketch.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GeometrySketch"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:ComTools="using:Microsoft.Toolkit.Uwp.DeveloperTools"
+    xmlns:ComToolsControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:Converter="using:GeometrySketch.Converter"
+    xmlns:ViewModel="using:GeometrySketch.ViewModels"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+
+    <Page.Resources>        
+        <Converter:SolidColorBrushToColor_Converter x:Key="SolidColorBrushToColor_Converter"/>
+        <Converter:VisibilityToBool_Converter x:Key="VisibilityToBool_Converter"/>
+        <Converter:BoolToVisibility_Converter x:Key="BoolToVisibility_Converter"/>
+        <Converter:BoolToCollapsed_Converter x:Key="BoolToCollapsed_Converter"/>
+        <Converter:BoolToZoomMode_Converter x:Key="BoolToZoomMode_Converter"/>        
+        <Converter:RadiusToLE_Converter x:Key="RadiusToLE_Converter"/>        
+    </Page.Resources>
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlAcrylicWindowBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="Grid_Title" Grid.Row="0" VerticalAlignment="Stretch" >
+                <TextBlock Text="GeometrySketch" x:Uid="TxBl_Titel" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="14"/>
+            </Grid>
+            <CommandBar x:Name="CommandBar_Left" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsOpen="False" DefaultLabelPosition="Collapsed" Background="Transparent" Height="40" VerticalAlignment="Top">
+                <CommandBar.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <InkToolbar x:Name="InkToolbar" TargetInkCanvas="{x:Bind InkCanvas_GeometrySketch}" InitialControls="None" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <InkToolbarBallpointPenButton x:Name="BallPointPen_Button" Palette="{x:Bind ViewModel.Colors_BallpointPen, Mode=TwoWay}" SelectedBrushIndex="{x:Bind ViewModel.SelectedColor_BallpointPen, Mode=TwoWay}" MinStrokeWidth="1" MaxStrokeWidth="10" GroupName="Pens" Checked="SelectedInkingToolChanged"/>
+                            <InkToolbarPencilButton x:Name="Pencil_Button" Palette="{x:Bind ViewModel.Colors_Pencil, Mode=TwoWay}" SelectedBrushIndex="{x:Bind ViewModel.SelectedColor_Pencil, Mode=TwoWay}" GroupName="Pens" Checked="SelectedInkingToolChanged"/>
+                            <InkToolbarHighlighterButton x:Name="Highlighter_Button" Palette="{x:Bind ViewModel.Colors_Highlighter, Mode=TwoWay}" SelectedBrushIndex="{x:Bind ViewModel.SelectedColor_Highlighter, Mode=TwoWay}" GroupName="Pens" Checked="SelectedInkingToolChanged"/>
+                            <InkToolbarEraserButton x:Name="EraserButton" GroupName="Pens" IsClearAllVisible="False" Checked="SelectedInkingToolChanged"/>
+                        </InkToolbar>
+                    </StackPanel>
+                </CommandBar.Content>
+                <AppBarSeparator/>               
+                <AppBarElementContainer>
+                    <InkToolbarCustomToggleButton x:Name="MousePenButton" Checked="MousePenButton_Checked" Unchecked="MousePenButton_Unchecked">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE962;"/>
+                </InkToolbarCustomToggleButton>
+                </AppBarElementContainer>
+                <AppBarSeparator/>
+                <AppBarElementContainer>
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Lineal" IsChecked="{x:Bind Lineal.IsVisible, Mode=TwoWay}" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                        <Image Source="{ThemeResource Icon_Lineal}" Height="26"/>
+                    </InkToolbarCustomToggleButton>                    
+                </AppBarElementContainer>                
+                <AppBarElementContainer>
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Geodreieck" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                        <Image Source="{ThemeResource Icon_Geodreieck}" Height="26"/>
+                    </InkToolbarCustomToggleButton>
+                </AppBarElementContainer>
+                <AppBarElementContainer>
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Zirkel" IsChecked="{x:Bind Zirkel.IsVisible, Mode=TwoWay}" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                        <Image Source="{ThemeResource Icon_Zirkel}" Height="26"/>
+                    </InkToolbarCustomToggleButton>
+                </AppBarElementContainer>
+                <AppBarElementContainer>
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Grid" IsChecked="{x:Bind ViewModel.AlignmentGridVisibilty, Mode=TwoWay}">
+                        <Image Source="{ThemeResource Icon_Grid}" Height="26"/>
+                    </InkToolbarCustomToggleButton>
+                </AppBarElementContainer>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="AppBarButton_Redo" Width="Auto" MinWidth="40" Icon="Redo" Label="Strich wiederherstellen" Click="AppBarButton_Redo_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Undo" Width="Auto" MinWidth="40" Icon="Undo" Label="Strich löschen" Click="AppBarButton_Undo_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Delete" Width="Auto" MinWidth="40" Label="Seite leeren" Icon="Clear" Click="AppBarButton_Delete_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarSeparator/>
+                <AppBarButton MinWidth="40" Label="Exportieren" Width="Auto" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Als .jpeg exportieren" Click="AppBarButton_Exportjpeg_Click"/>
+                            <MenuFlyoutItem Text="Als .bmp exporieren" Click="AppBarButton_Exportbmp_Click"/>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Copy" Click="AppBarButton_Copy_Click" MinWidth="40" Label="In Zwischenablage kopieren" Width="Auto" Icon="Copy" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Print" Click="AppBarButton_Print_Click" MinWidth="40" Label="Drucken" Width="Auto" Icon="Print" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarSeparator/>
+                <AppBarButton x:Name="AppBarButton_New" MinWidth="40" Label="Neue Seite erstellen" Width="Auto" Icon="NewFolder" Style="{ThemeResource AppBarButtonRevealStyle}" Click="AppBarButton_New_Click"/>
+                <AppBarButton x:Name="AppBarButton_Open" MinWidth="40" Label="Öffnen" HorizontalContentAlignment="Center" Click="AppBarButton_Open_Click" Width="Auto" Icon="OpenFile" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Save" MinWidth="40" Label="Speichern" Click="AppBarButton_Save_Click" Width="Auto" Icon="Save" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton LabelPosition="Collapsed" Label="Einstellungen" Icon="Setting" Click="AppBarButton_Settings_Click" Width="Auto"/>
+                </CommandBar.SecondaryCommands>
+            </CommandBar> 
+        </Grid>
+        <Grid x:Name="Grid_ScrollViewer" Grid.Row="1" Background="{ThemeResource Canvas_Background}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <ScrollViewer x:Name="ScrollViewer_InkCanvas" MinZoomFactor="0.1" MaxZoomFactor="2" ZoomMode="Enabled" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible" >
+                <Grid x:Name="Grid_InkContainer" Width="2121" Height="3021">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="10"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                    </Grid.ColumnDefinitions>                    
+                    <Grid x:Name="Grid_InkCanvas" Grid.Column="1" Grid.Row="1" Background="White">                        
+                        <Grid x:Name="Container" Opacity="0"/>
+                        <ComTools:AlignmentGrid x:Name="AlignmentGrid_InkCanvas" Visibility="{x:Bind ViewModel.AlignmentGridVisibilty, Mode=OneWay}" Background="White" Opacity="1" LineBrush="Black" HorizontalStep="50" VerticalStep="50"/>
+                        <InkCanvas x:Name="InkCanvas_GeometrySketch" ManipulationMode="TranslateX, TranslateY, Scale, Rotate, TranslateInertia" PointerWheelChanged="InkCanvas_PointerWheelChanged" ManipulationDelta="InkCanvas_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted"/>
+                        <Polygon x:Name="Polygon_GeodreieckBackground" Points="0 799 1600 799 800 0" Visibility="{x:Bind Geodreieck.Visibility, Mode=OneWay}" Fill="#ECECEC" Opacity="0.75" IsHitTestVisible="False">
+                            <Polygon.RenderTransform>
+                                <TransformGroup>
+                                    <TranslateTransform  X="{x:Bind Geodreieck_TranslateTransform.X, Mode=OneWay}" Y="{x:Bind Geodreieck_TranslateTransform.Y, Mode=OneWay}"/>
+                                    <RotateTransform Angle="{x:Bind Geodreieck_RotateTransform.Angle, Mode=OneWay}" CenterX="{x:Bind Geodreieck_RotateTransform.CenterX, Mode=OneWay}" CenterY="{x:Bind Geodreieck_RotateTransform.CenterY, Mode=OneWay}"/>
+                                </TransformGroup>
+                            </Polygon.RenderTransform>
+                        </Polygon>
+                        <Polygon x:Name="Polygon_GeodreieckStroke" Points="0 799 1600 799 800 0" Visibility="{x:Bind Geodreieck.Visibility, Mode=OneWay}" Stroke="Black" StrokeThickness="1" IsHitTestVisible="False">
+                            <Polygon.RenderTransform>
+                                <TransformGroup>
+                                    <TranslateTransform  X="{x:Bind Geodreieck_TranslateTransform.X, Mode=OneWay}" Y="{x:Bind Geodreieck_TranslateTransform.Y, Mode=OneWay}"/>
+                                    <RotateTransform Angle="{x:Bind Geodreieck_RotateTransform.Angle, Mode=OneWay}" CenterX="{x:Bind Geodreieck_RotateTransform.CenterX, Mode=OneWay}" CenterY="{x:Bind Geodreieck_RotateTransform.CenterY, Mode=OneWay}"/>
+                                </TransformGroup>
+                            </Polygon.RenderTransform>
+                        </Polygon>
+                        <Image x:Name="Geodreieck" Opacity="1" Visibility="{x:Bind ITBCTB_Geodreieck.IsChecked, Converter={StaticResource BoolToVisibility_Converter}, Mode=OneWay}" PointerWheelChanged="Geodreieck_PointerWheelChanged" ManipulationMode="TranslateX, TranslateY, Rotate, Scale" ManipulationDelta="Geodreieck_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted" Source="/Assets/Geodreieck.svg.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1600" IsHitTestVisible="False">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <TranslateTransform x:Name="Geodreieck_TranslateTransform"/>
+                                    <RotateTransform x:Name="Geodreieck_RotateTransform"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>                        
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+        <ComToolsControls:Expander x:Name="Expander_DrawingToolsDetails" Background="{ThemeResource SystemControlAcrylicWindowBrush}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ExpandDirection="Up"  Grid.Row="2" VerticalAlignment="Bottom" IsExpanded="true" Header="Schnelleinstellungen der Zeichenwerkzeuge" HeaderStyle="{StaticResource ToggleButton_ExpanderHeader_Style}">
+        <Grid x:Name="Grid_DrawingToolDetails" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{x:Bind ViewModel.SelectedPen}" Background="{ThemeResource SystemControlAcrylicWindowBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" MinWidth="180"/>
+                <ColumnDefinition Width="*" MinWidth="180"/>
+                <ColumnDefinition Width="200" MinWidth="180"/>
+            </Grid.ColumnDefinitions>
+                <TextBlock Text="Farben" Grid.Column="1" VerticalAlignment="Center"/>
+                <TextBlock Text="Größe" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <TextBlock Text="{x:Bind ViewModel.SelectedDrawingTool, Mode=OneWay}" Grid.Column="2" VerticalAlignment="Center"/>
+                <GridView x:Name="GridView_Colors" Grid.Row="1" MinWidth="100" HorizontalAlignment="Left" Style="{StaticResource GridView_Colors_Style}" IsItemClickEnabled="True" Visibility="{x:Bind ViewModel.DrawingToolsDetailsVisibility, Mode=OneWay}" SelectedIndex="{Binding Path=SelectedBrushIndex, Mode=TwoWay}" ItemsSource="{Binding Path=Palette, Mode=OneWay}" SelectionChanged="GridView_Colors_SelectionChanged" Grid.Column="1">
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="SolidColorBrush" >
+                            <Grid>
+                                <Ellipse Margin="8" UseLayoutRounding="false" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="36" Width="36" Fill="{x:Bind Color, Converter={StaticResource SolidColorBrushToColor_Converter}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            <StackPanel Grid.Row="1" Grid.Column="0" Visibility="{x:Bind ViewModel.DrawingToolsDetailsVisibility, Mode=OneWay}">
+                <Slider x:Name="Slider_StrokeWidth" Width="255" Margin="10,4,0,0" Height="44"  HorizontalAlignment="Left" Visibility="{x:Bind ViewModel.DrawingToolsDetailsVisibility, Mode=OneWay}" VerticalAlignment="Center" Value="{x:Bind ViewModel.SelectedPen.SelectedStrokeWidth, Mode=TwoWay}" Maximum="{x:Bind ViewModel.SelectedPen.MaxStrokeWidth, Mode=TwoWay}" Minimum="{x:Bind ViewModel.SelectedPen.MinStrokeWidth, Mode=TwoWay}" ValueChanged="Slider_ValueChanged"/>
+                <Grid VerticalAlignment="Stretch" MinHeight="100" UseLayoutRounding="false" HorizontalAlignment="Stretch">
+                    <InkCanvas x:Name="PreviewInkStrokeCanvas" Margin="-10,4,12,4" Height="auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Grid>
+            </StackPanel>
+                <Grid x:Name="Grid_GeodreieckDetail" Grid.Column="2" Grid.Row="1" Visibility="{x:Bind ITBCTB_Geodreieck.IsChecked, Converter={StaticResource BoolToVisibility_Converter}, Mode=OneWay}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Drehwinkel" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind Slider_GeodreieckAngel.Value, Mode=OneWay}" Margin="30,0,0,0"/>
+                            <TextBlock Text="°"/>                            
+                        </StackPanel>
+                        <Slider x:Name="Slider_GeodreieckAngel" IsThumbToolTipEnabled="False" Value="0" TickPlacement="BottomRight" TickFrequency="45" SmallChange="1" Minimum="0" Maximum="360" ValueChanged="Slider_GeodreieckAngel_ValueChanged" Margin="0,0,10,0"/>
+                    </StackPanel>
+                </Grid>                
+                <Grid x:Name="Grid_ZirkelDetail" Grid.Column="2" Grid.Row="1" Visibility="{x:Bind ITBCTB_Zirkel.IsChecked, Converter={StaticResource BoolToVisibility_Converter}, Mode=OneWay}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Radius" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind Slider_ZirkelRadius.Value, Converter={StaticResource RadiusToLE_Converter}, Mode=OneWay}" Margin="30,0,0,0"/>
+                            <TextBlock Text=" LE"/>
+                        </StackPanel>
+                        <Slider x:Name="Slider_ZirkelRadius" SmallChange="10" LargeChange="100"  IsThumbToolTipEnabled="False" Value="{x:Bind Zirkel.Radius, Mode=TwoWay}" Minimum="82" Maximum="1000" Margin="0,0,10,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+    </ComToolsControls:Expander>
+    <ContentDialog x:Name="CD_Settings" Grid.RowSpan="3" Title="Einstellungen und Informationen" PrimaryButtonText="OK" Margin="-35,-95,35,95">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="Darstellung" FontSize="16"/>
+                    <RadioButton x:Name="RadioButton_Light" Margin="10,10,0,0" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" IsChecked="{x:Bind ViewModel.ThemeLight, Mode=TwoWay}" Checked="Theme_CheckedChangedAsync" Content="Hell" GroupName="Theme"/>
+                    <RadioButton x:Name="RadioButton_Dark" Margin="10,0,0,0" Grid.Row="1" Grid.Column="1" Content="Dunkel" IsChecked="{x:Bind ViewModel.ThemeDark, Mode=TwoWay}" Checked="Theme_CheckedChangedAsync" GroupName="Theme"/>
+                    <RadioButton x:Name="RadioButton_System" Margin="10,0,0,0" Grid.Row="1" Grid.Column="1" Content="Verwende Systemeinstellungen" IsChecked="{x:Bind ViewModel.ThemeSystem,Mode=TwoWay}" Checked="Theme_CheckedChangedAsync" GroupName="Theme"/>
+                    <TextBlock Text="Drittanbieter-Software" Margin="0,30,0,0" FontSize="16"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="Newtonsoft Json v12.0.3 von James Newton King:" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="EULA" NavigateUri="https://licenses.nuget.org/MIT" Margin="30,0,0,0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <TextBlock Text="Syncfusion Controls for UWP v17.4.0.50:" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://www.syncfusion.com/license/17.4.0.39/syncfusion_essential_studio_eula.pdf"/>
+                        <HyperlinkButton Content="FAQs" Margin="30,0,0,0" NavigateUri="https://www.syncfusion.com/products/communitylicense"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <TextBlock Text="Microsoft.NetCore UWP v6.2.9:" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://github.com/Microsoft/dotnet/blob/master/releases/UWP/LICENSE.TXT"/>
+                    </StackPanel>
+                    <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="Version 1.2.0 entwickelt von" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:punkteschluessel@outlook.de" Margin="10,0,0,0"/>
+                    </StackPanel>
+                    <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/Punkteschluessel" Margin="10,0,0,0"/>
+                    <HyperlinkButton Content="Datenschutzhinweise" NavigateUri="https://github.com/HuHe86/Punkteschluessel/blob/master/Datenschutzhinweise" Margin="10,0,0,0"/>
+                    <HyperlinkButton Content="Bewertung abgeben" NavigateUri="ms-windows-store://review/?productid=9NHZX484KD4M" Margin="10,0,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
+        <ProgressRing IsActive="{x:Bind ViewModel.ProgressRingActive, Mode=OneWay}" Height="100" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+    </Grid>
+</Page>

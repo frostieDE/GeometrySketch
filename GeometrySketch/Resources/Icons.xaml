@@ -1,0 +1,36 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GeometrySketch.Resources">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <x:String x:Key="Icon_Grid">
+                /Assets/Icons/Icon_Grid_Dark.png
+            </x:String>
+            <x:String x:Key="Icon_Zirkel">
+                /Assets/Icons/Icon_Zirkel_Dark.png
+            </x:String>
+            <x:String x:Key="Icon_Geodreieck">
+                /Assets/Icons/Icon_Geodreieck_Dark.png
+            </x:String>
+            <x:String x:Key="Icon_Lineal">
+                /Assets/Icons/Icon_Lineal_Dark.png
+            </x:String>            
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <x:String x:Key="Icon_Grid">
+                /Assets/Icons/Icon_Grid_Light.png
+            </x:String>
+            <x:String x:Key="Icon_Zirkel">
+                /Assets/Icons/Icon_Zirkel_Light.png
+            </x:String>
+            <x:String x:Key="Icon_Geodreieck">
+                /Assets/Icons/Icon_Geodreieck_Light.png
+            </x:String>
+            <x:String x:Key="Icon_Lineal">
+                /Assets/Icons/Icon_Lineal_Light.png
+            </x:String>            
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

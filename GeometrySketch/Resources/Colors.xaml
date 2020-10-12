@@ -1,0 +1,16 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GeometrySketch.Resources">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="Canvas_Background" Color="#313131"/>
+            <AcrylicBrush x:Key="Ruler_Background" TintColor="Transparent" FallbackColor="Transparent" TintOpacity="0.1" TintLuminosityOpacity="1" BackgroundSource="Backdrop"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">            
+            <SolidColorBrush x:Key="Canvas_Background" Color="DarkGray"/>
+            <AcrylicBrush x:Key="Ruler_Background" TintColor="Transparent" FallbackColor="Transparent" TintOpacity="0.1" TintLuminosityOpacity="1" BackgroundSource="Backdrop"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>
