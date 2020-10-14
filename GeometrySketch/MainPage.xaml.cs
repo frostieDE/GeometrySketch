@@ -24,12 +24,6 @@ using Windows.Graphics.Imaging;
 using Windows.Storage.Pickers;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using Windows.UI.Input;
-using Windows.UI.Input.Preview.Injection;
-using System.ServiceModel.Channels;
-using Windows.UI.Xaml.Data;
-using Windows.Devices.Input;
-using System.Reflection;
 using Windows.System.Threading;
 
 namespace GeometrySketch
@@ -185,7 +179,28 @@ namespace GeometrySketch
         }
         private async void AppBarButton_Open_Click(object sender, RoutedEventArgs e)
         {
-            await ViewModel.FileOpenAsync(InkCanvas_GeometrySketch);
+            if (SaveNecessity == true && InkCanvas_GeometrySketch.InkPresenter.StrokeContainer.GetStrokes().Count != 0)
+            {
+                ContentDialogResult result = await CD_SaveQuery.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    await ViewModel.FileSaveAsync(InkCanvas_GeometrySketch);
+                    await ViewModel.FileOpenAsync(InkCanvas_GeometrySketch);
+                }
+                else if (result == ContentDialogResult.Secondary)
+                {
+                    await ViewModel.FileOpenAsync(InkCanvas_GeometrySketch);
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+                await ViewModel.FileOpenAsync(InkCanvas_GeometrySketch);
+            }            
             SaveNecessity = false;
         }
         //Geodreieck DeltaManipulation        
@@ -315,7 +330,7 @@ namespace GeometrySketch
                 }
                 ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
             }
-            else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false)
+            else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && VisibilityGeodreieck == Visibility.Visible)
             {
                 double x, y, dw;
                 ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
@@ -367,7 +382,24 @@ namespace GeometrySketch
                 Geodreieck_RotateTransform.CenterX = _dz.X;
                 Geodreieck_RotateTransform.CenterY = _dz.Y;
                 Geodreieck_RotateTransform.Angle = ViewModel.Drehwinkel;                
-            }                      
+            }            
+            else
+            {
+                double x = e.Delta.Translation.X;
+                double y = e.Delta.Translation.Y;
+                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
+                ScaleFactor *= e.Delta.Scale;
+
+                if (Math.Abs(x) > Math.Abs(y))
+                {
+                    ScrollViewer_InkCanvas.ChangeView(ScrollViewer_InkCanvas.HorizontalOffset - x, null, ScaleFactor);
+                }
+                else
+                {
+                    ScrollViewer_InkCanvas.ChangeView(null, ScrollViewer_InkCanvas.VerticalOffset - y, ScaleFactor);
+                }
+                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
+            }
         }
         private void InkCanvas_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         { 

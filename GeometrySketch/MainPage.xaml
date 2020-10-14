@@ -115,7 +115,7 @@
                     <Grid x:Name="Grid_InkCanvas" Grid.Column="1" Grid.Row="1" Background="White">                        
                         <Grid x:Name="Container" Opacity="0"/>
                         <ComTools:AlignmentGrid x:Name="AlignmentGrid_InkCanvas" Visibility="{x:Bind ViewModel.AlignmentGridVisibilty, Mode=OneWay}" Background="White" Opacity="1" LineBrush="Black" HorizontalStep="50" VerticalStep="50"/>
-                        <InkCanvas x:Name="InkCanvas_GeometrySketch" ManipulationMode="TranslateX, TranslateY, Scale, Rotate, TranslateInertia" PointerWheelChanged="InkCanvas_PointerWheelChanged" ManipulationDelta="InkCanvas_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted"/>
+                        <InkCanvas x:Name="InkCanvas_GeometrySketch" ManipulationMode="All" PointerWheelChanged="InkCanvas_PointerWheelChanged" ManipulationDelta="InkCanvas_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted"/>
                         <Polygon x:Name="Polygon_GeodreieckBackground" Points="0 799 1600 799 800 0" Visibility="{x:Bind Geodreieck.Visibility, Mode=OneWay}" Fill="#ECECEC" Opacity="0.75" IsHitTestVisible="False">
                             <Polygon.RenderTransform>
                                 <TransformGroup>
