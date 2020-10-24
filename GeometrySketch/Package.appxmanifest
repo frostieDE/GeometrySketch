@@ -9,11 +9,11 @@
   IgnorableNamespaces="uap mp rescap uap3">
 
   <Identity
-    Name="9a1f35da-502f-44b7-85fe-cf57a8b3950b"
-    Publisher="CN=Huber"
+    Name="56085HuHe.GeometrySketch"
+    Publisher="CN=9BE6E0E6-4A76-4A20-9FFB-9668FFE3C6E2"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="9a1f35da-502f-44b7-85fe-cf57a8b3950b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="230e2c22-ed95-4608-8714-230b739dab7a" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>GeometrySketch</DisplayName>
@@ -64,9 +64,9 @@
   </Applications>
 
   <Capabilities>
-    <Capability Name="internetClient" />
+    <Capability Name="internetClient" /> 
+    <uap:Capability Name="removableStorage"/>
     <rescap:Capability Name="confirmAppClose"/>
     <rescap:Capability Name="broadFileSystemAccess"/>
-    <uap:Capability Name="removableStorage"/>
   </Capabilities>
 </Package>

@@ -40,6 +40,15 @@ namespace GeometrySketch
         {
             MainPage mainPage = null;
 
+            ContentDialog CD_AuthorizationMessage = new ContentDialog()
+            {
+                Title = "Fehlende Berechtigung",
+                Content = "Ihnen fehlt die Berechtigung auf die Datei zuzugreifen, da Sie evtl. verschoben wurde?  Öffnen sie die Skizze stattdessen über den Button 'Öffnen' oder erteilen Sie GeometrySketch unter Datenschutzeinstellungen die entsprechende Berechtigung.",
+                CloseButtonText = "OK",
+                PrimaryButtonText = "Datenschutzeinstellungen"               
+            };
+            CD_AuthorizationMessage.PrimaryButtonClick += CD_AuthorizationMessage_PrimaryButtonClick;
+
             if (Window.Current.Content is MainPage)
             {
                 mainPage = Window.Current.Content as MainPage;
@@ -52,12 +61,26 @@ namespace GeometrySketch
                     if (result == ContentDialogResult.Primary)
                     {
                         await mainPage.ViewModel.FileSaveAsync(mainPage.CurrentInkCanvas);
-                        await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                        try
+                        {
+                            await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                        }
+                        catch
+                        {
+                            CD_AuthorizationMessage.ShowAsync();
+                        }
                         mainPage.ViewModel.ProgressRingActive = false;
                     }
                     else if (result == ContentDialogResult.Secondary)
                     {
-                        await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                        try
+                        {
+                            await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                        }
+                        catch
+                        {
+                            CD_AuthorizationMessage.ShowAsync();
+                        }
                         mainPage.ViewModel.ProgressRingActive = false;
                     }
                     else
@@ -67,7 +90,14 @@ namespace GeometrySketch
                 }
                 else
                 {
-                    await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                    try
+                    {
+                        await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                    }
+                    catch
+                    {
+                        CD_AuthorizationMessage.ShowAsync();
+                    }
                     mainPage.ViewModel.ProgressRingActive = false;
                 }
             }
@@ -77,10 +107,23 @@ namespace GeometrySketch
                 Window.Current.Content = mainPage;
                 var fileArgs = args as FileActivatedEventArgs;
                 string _filePath = fileArgs?.Files[0].Path;
-                await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                try
+                {
+                    await mainPage.ViewModel.AppFileOpenAsync(_filePath, mainPage.CurrentInkCanvas);
+                }
+                catch
+                {
+                    CD_AuthorizationMessage.ShowAsync();
+                }
+                mainPage.ViewModel.ProgressRingActive = false;
                 mainPage.ViewModel.ProgressRingActive = false;
             }
             Window.Current.Activate();
+        }
+
+        private async void CD_AuthorizationMessage_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-Settings:privacy-broadfilesystemaccess"));
         }
 
         /// <summary>

@@ -52,9 +52,11 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point();
-                p.X = _dz.X + Math.Cos((180 - ViewModel.Drehwinkel) / 180 * Math.PI) * 800;
-                p.Y = _dz.Y - Math.Sin((180 - ViewModel.Drehwinkel) / 180 * Math.PI) * 800;
+                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                {
+                    X = _dz.X + Math.Cos((180 - ViewModel.Drehwinkel) / 180 * Math.PI) * 800,
+                    Y = _dz.Y - Math.Sin((180 - ViewModel.Drehwinkel) / 180 * Math.PI) * 800
+                };               
                 return p;
             }
         }
@@ -62,9 +64,11 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point();
-                p.X = _dz.X + Math.Cos((-ViewModel.Drehwinkel) / 180 * Math.PI) * 800;
-                p.Y = _dz.Y - Math.Sin((-ViewModel.Drehwinkel) / 180 * Math.PI) * 800;
+                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                {
+                    X = _dz.X + Math.Cos((-ViewModel.Drehwinkel) / 180 * Math.PI) * 800,
+                    Y = _dz.Y - Math.Sin((-ViewModel.Drehwinkel) / 180 * Math.PI) * 800
+                };
                 return p;
             }
         }
@@ -72,9 +76,11 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point();
-                p.X = _dz.X + Math.Cos((90 - ViewModel.Drehwinkel) / 180 * Math.PI) * 799;
-                p.Y = _dz.Y - Math.Sin((90 - ViewModel.Drehwinkel) / 180 * Math.PI) * 799;
+                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                {
+                    X = _dz.X + Math.Cos((90 - ViewModel.Drehwinkel) / 180 * Math.PI) * 799,
+                    Y = _dz.Y - Math.Sin((90 - ViewModel.Drehwinkel) / 180 * Math.PI) * 799
+                };
                 return p;
             }
         }
@@ -203,6 +209,7 @@ namespace GeometrySketch
             }            
             SaveNecessity = false;
         }
+
         //Geodreieck DeltaManipulation        
         private void Geodreieck_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {            
@@ -254,9 +261,11 @@ namespace GeometrySketch
         }
         private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            Windows.Foundation.Point pt = new Windows.Foundation.Point();
-            pt.X = e.GetCurrentPoint(Grid_InkCanvas).Position.X;
-            pt.Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y;           
+            Windows.Foundation.Point pt = new Windows.Foundation.Point()
+            {
+                X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
+                Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
+            };
 
             if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
             {
@@ -402,10 +411,12 @@ namespace GeometrySketch
             }
         }
         private void InkCanvas_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
-        { 
-            Windows.Foundation.Point pt = new Windows.Foundation.Point();
-            pt.X = e.GetCurrentPoint(Grid_InkCanvas).Position.X;
-            pt.Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y;
+        {
+            Windows.Foundation.Point pt = new Windows.Foundation.Point()
+            {
+                X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
+                Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
+            };
 
             if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
             {
@@ -770,7 +781,7 @@ namespace GeometrySketch
             grid.Margin = Grid_InkCanvas.Margin;
             grid.BorderThickness = Grid_InkCanvas.BorderThickness;
             grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-            grid.VerticalAlignment = VerticalAlignment.Stretch;
+            grid.VerticalAlignment = VerticalAlignment.Stretch;            
 
             var rtb = new RenderTargetBitmap();
             await rtb.RenderAsync(Grid_InkCanvas);
@@ -784,17 +795,18 @@ namespace GeometrySketch
             BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
             encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
 
-            await encoder.FlushAsync(); stream.Seek(0); 
-            
-            Image img = new Image();
-            img.Width = Grid_InkCanvas.Width;
-            img.Height = Grid_InkCanvas.Height;
-            BitmapImage bimg = new BitmapImage();
+            await encoder.FlushAsync(); stream.Seek(0);
 
+            Image img = new Image()
+            {
+                Width = Grid_InkCanvas.Width,
+                Height = Grid_InkCanvas.Height
+            };           
+            BitmapImage bimg = new BitmapImage();
             await bimg.SetSourceAsync(stream);
             img.Source = bimg;
 
-            Viewbox vb = new Viewbox();
+            Viewbox vb = new Viewbox();            
             vb.Child = grid;
 
             grid.Children.Add(img);
@@ -876,11 +888,13 @@ namespace GeometrySketch
         }
         private async void AppBarButton_Exportbmp_Click(object sender, RoutedEventArgs e)
         {
-            FileSavePicker savePicker = new FileSavePicker();
-            savePicker.SuggestedStartLocation = PickerLocationId.Desktop;
+            FileSavePicker savePicker = new FileSavePicker()
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop,
+                DefaultFileExtension = ".bmp",
+                SuggestedFileName = "Skizze"
+            };
             savePicker.FileTypeChoices.Add("bmp", new List<string>() { ".bmp" });
-            savePicker.DefaultFileExtension = ".bmp";
-            savePicker.SuggestedFileName = "Skizze";
 
             StorageFile file = await savePicker.PickSaveFileAsync();
 

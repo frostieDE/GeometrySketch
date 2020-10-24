@@ -213,31 +213,19 @@ namespace GeometrySketch.ViewModels
         public async Task AppFileOpenAsync(string path, InkCanvas inkCanvas)
         {
             StorageFile file;
-            try
+            file = await StorageFile.GetFileFromPathAsync(path);
+
+            if (file != null)
             {
-                file = await StorageFile.GetFileFromPathAsync(path);
-
-                if (file != null)
-                {
-                    ProgressRingActive = true;
-
-                    await _inkPageDataProvider.OpenInkPageAsync(inkCanvas, inkPage, file);
-
-                    // Add to FA without metadata
-                    string faToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(file);
-                    UpdateViewModel();
-                    ProgressRingActive = false;
-                    //SaveNecessity = false;
-                }
-                else
-                {
-                    //Operation abgebrochen
-                }
+                ProgressRingActive = true;
+                await _inkPageDataProvider.OpenInkPageAsync(inkCanvas, inkPage, file);                
+                UpdateViewModel();
+                ProgressRingActive = false;               
             }
-            catch
+            else
             {
-                ProgressRingActive = false;
-            }            
+                //Operation abgebrochen
+            }                       
         }
         public async Task FileOpenAsync(InkCanvas inkCanvas)
         {            

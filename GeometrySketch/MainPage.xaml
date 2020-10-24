@@ -2,14 +2,11 @@
     x:Class="GeometrySketch.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:GeometrySketch"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
-    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ComTools="using:Microsoft.Toolkit.Uwp.DeveloperTools"
     xmlns:ComToolsControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:Converter="using:GeometrySketch.Converter"
-    xmlns:ViewModel="using:GeometrySketch.ViewModels"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -208,22 +205,26 @@
                         <HyperlinkButton Content="EULA" NavigateUri="https://licenses.nuget.org/MIT" Margin="30,0,0,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                        <TextBlock Text="Syncfusion Controls for UWP v17.4.0.50:" VerticalAlignment="Center"/>
-                        <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://www.syncfusion.com/license/17.4.0.39/syncfusion_essential_studio_eula.pdf"/>
-                        <HyperlinkButton Content="FAQs" Margin="30,0,0,0" NavigateUri="https://www.syncfusion.com/products/communitylicense"/>
+                        <TextBlock Text="Windows Community Toolkit v6.1.1:" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://github.com/windows-toolkit/WindowsCommunityToolkit/blob/master/license.md"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                        <TextBlock Text="Microsoft.NetCore UWP v6.2.9:" VerticalAlignment="Center"/>
+                        <TextBlock Text="Microsoft.NetCore UWP v6.2.10:" VerticalAlignment="Center"/>
                         <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://github.com/Microsoft/dotnet/blob/master/releases/UWP/LICENSE.TXT"/>
+                    </StackPanel>
+                    <TextBlock Text="Bildnachweis" Margin="0,30,0,0" FontSize="16"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="Geodreieck von Erik Streb" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="EULA" NavigateUri="https://commons.wikimedia.org/wiki/File:Set_square_Geodreieck.svg" Margin="30,0,0,0" />
                     </StackPanel>
                     <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
                     <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
-                        <TextBlock Text="Version 1.2.0 entwickelt von" VerticalAlignment="Center"/>
-                        <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:punkteschluessel@outlook.de" Margin="10,0,0,0"/>
+                        <TextBlock Text="Version 1.0.0 entwickelt von" VerticalAlignment="Center"/>
+                        <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/Punkteschluessel" Margin="10,0,0,0"/>
-                    <HyperlinkButton Content="Datenschutzhinweise" NavigateUri="https://github.com/HuHe86/Punkteschluessel/blob/master/Datenschutzhinweise" Margin="10,0,0,0"/>
-                    <HyperlinkButton Content="Bewertung abgeben" NavigateUri="ms-windows-store://review/?productid=9NHZX484KD4M" Margin="10,0,0,0"/>
+                    <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/GeometrySketch" Margin="10,0,0,0"/>
+                    <HyperlinkButton Content="Datenschutzhinweise" NavigateUri="https://github.com/HuHe86/GeometrySketch/blob/master/Datenschutzhinweise" Margin="10,0,0,0"/>
+                    <HyperlinkButton Content="Bewertung abgeben" NavigateUri="ms-windows-store://review/?productid=9NKTD2J3H6N4" Margin="10,0,0,0"/>
                 </StackPanel>
             </ScrollViewer>
         </ContentDialog>
