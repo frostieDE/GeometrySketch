@@ -7,6 +7,21 @@ namespace GeometrySketch.Commons
 {
     public static class GeometryHelper
     {
+        //nrp = nearest point, ap = actual point, sw = strokewidth
+        public static Point NewInkPoint(Point nrp, Point ap, double sw)
+        {
+            Point pt = new Point();
+
+            Vector2 vector_a = new Vector2((float)(ap.X - nrp.X), (float)(ap.Y - nrp.Y));
+            vector_a = Vector2.Normalize(vector_a);
+
+            pt.X = nrp.X + 0.5 * sw * vector_a.X;
+            pt.Y = nrp.Y + 0.5 * sw * vector_a.Y;
+
+            return pt;
+        }
+
+
         public static Point NearestPointOnGeodreieck(Point p1, Point p2, Point p3, Point p)
         {
             Point pt = new Point();

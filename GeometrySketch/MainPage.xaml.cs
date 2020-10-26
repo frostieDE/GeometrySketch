@@ -570,10 +570,12 @@ namespace GeometrySketch
         //Snap to Geodreieck
         private bool Snap { get; set; }
         private bool IsInkSpace { get; set; }
+        private double CurrentStrokeWidth { get; set; } = 1;
         CoreWetStrokeUpdateSource coreWetStrokeUpdateSource { get; set; }       
         private void SnapPoints(IList<InkPoint> newInkPoints)
         {
             Windows.Foundation.Point p = new Windows.Foundation.Point();
+                      
 
             for (int i = 0; i < newInkPoints.Count; i++)
             {
@@ -582,8 +584,8 @@ namespace GeometrySketch
                 if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == false)
                 {
                     Windows.Foundation.Point pt = GeometryHelper.NearestPointOnGeodreieck(P1, P2, P3, p);                  
-
-                    newInkPoints[i] = new InkPoint(pt, newInkPoints[i].Pressure);
+                    Windows.Foundation.Point np = GeometryHelper.NewInkPoint(pt, p, CurrentStrokeWidth);
+                    newInkPoints[i] = new InkPoint(np, newInkPoints[i].Pressure);
                 }
                 else
                 {
@@ -736,6 +738,7 @@ namespace GeometrySketch
         private void Slider_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             PenAttributesChanged();
+            
         }
         private void GridView_Colors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -763,6 +766,8 @@ namespace GeometrySketch
             da.IgnorePressure = true;
             ViewModel.UpdatePreviewInkStroke(da);
             PreviewInkStrokeCanvas.InkPresenter.StrokeContainer.AddStroke(ViewModel.PreviewInkStroke);
+
+            CurrentStrokeWidth = Slider_StrokeWidth.Value;
         }
 
         PrintHelper printHelper;
