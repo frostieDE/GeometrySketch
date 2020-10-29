@@ -218,7 +218,7 @@ namespace GeometrySketch
 
             x = 1 / ScaleFactor * e.Delta.Translation.X;
             y = 1 / ScaleFactor * e.Delta.Translation.Y;
-            dw = Math.Round(e.Delta.Rotation, 1);
+            dw = Math.Round(e.Delta.Rotation, 1);            
 
             Geodreieck_TranslateTransform.X = Geodreieck_TranslateTransform.X + x;
             Geodreieck_TranslateTransform.Y = Geodreieck_TranslateTransform.Y + y;
@@ -261,39 +261,46 @@ namespace GeometrySketch
         }
         private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            Windows.Foundation.Point pt = new Windows.Foundation.Point()
+            try
             {
-                X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
-                Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
-            };
+                Windows.Foundation.Point pt = new Windows.Foundation.Point()
+                {
+                    X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
+                    Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
+                };
 
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
-            {
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
+                if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
 
-                var pointer = e.GetCurrentPoint(Grid_InkCanvas);
-                ViewModel.Drehwinkel = ViewModel.Drehwinkel - pointer.Properties.MouseWheelDelta / 120;
+                    var pointer = e.GetCurrentPoint(Grid_InkCanvas);
+                    ViewModel.Drehwinkel = ViewModel.Drehwinkel - pointer.Properties.MouseWheelDelta / 120;
 
-                Slider_GeodreieckAngel.Value = 360 - ViewModel.Drehwinkel;
+                    Slider_GeodreieckAngel.Value = 360 - ViewModel.Drehwinkel;
 
-                Geodreieck_RotateTransform.CenterX = _dz.X;
-                Geodreieck_RotateTransform.CenterY = _dz.Y;
-                Geodreieck_RotateTransform.Angle = ViewModel.Drehwinkel;
+                    Geodreieck_RotateTransform.CenterX = _dz.X;
+                    Geodreieck_RotateTransform.CenterY = _dz.Y;
+                    Geodreieck_RotateTransform.Angle = ViewModel.Drehwinkel;
+                }
+                else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                }
+                else
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                }
             }
-            else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
-            {                
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
-            }
-            else
+            catch
             {
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
-            }           
+
+            }
         }
         private void Geodreieck_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
@@ -346,7 +353,7 @@ namespace GeometrySketch
 
                 x = 1 / ScaleFactor * e.Delta.Translation.X;
                 y = 1 / ScaleFactor * e.Delta.Translation.Y;
-                dw = Math.Round(e.Delta.Rotation, 1);
+                dw = Math.Round(e.Delta.Rotation, 1);                
 
                 Geodreieck_TranslateTransform.X = Geodreieck_TranslateTransform.X + x;
                 Geodreieck_TranslateTransform.Y = Geodreieck_TranslateTransform.Y + y;
@@ -359,7 +366,7 @@ namespace GeometrySketch
                 {
                     ViewModel.Drehwinkel = ViewModel.Drehwinkel - 360;
                 }
-
+                
                 //Bindung an Koordinatenachsen
                 if (-0.5 <= ViewModel.Drehwinkel && ViewModel.Drehwinkel <= 0.5)
                 {
@@ -412,38 +419,45 @@ namespace GeometrySketch
         }
         private void InkCanvas_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            Windows.Foundation.Point pt = new Windows.Foundation.Point()
+            try
             {
-                X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
-                Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
-            };
+                Windows.Foundation.Point pt = new Windows.Foundation.Point()
+                {
+                    X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
+                    Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
+                };
 
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
-            {
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
+                if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
 
-                var pointer = e.GetCurrentPoint(Grid_InkCanvas);                
-                ViewModel.Drehwinkel = ViewModel.Drehwinkel - pointer.Properties.MouseWheelDelta / 120;  
-                
-                Slider_GeodreieckAngel.Value = 360 - ViewModel.Drehwinkel;
-                
-                Geodreieck_RotateTransform.CenterX = _dz.X;
-                Geodreieck_RotateTransform.CenterY = _dz.Y;
-                Geodreieck_RotateTransform.Angle = ViewModel.Drehwinkel; 
+                    var pointer = e.GetCurrentPoint(Grid_InkCanvas);
+                    ViewModel.Drehwinkel = ViewModel.Drehwinkel - pointer.Properties.MouseWheelDelta / 120;
+
+                    Slider_GeodreieckAngel.Value = 360 - ViewModel.Drehwinkel;
+
+                    Geodreieck_RotateTransform.CenterX = _dz.X;
+                    Geodreieck_RotateTransform.CenterY = _dz.Y;
+                    Geodreieck_RotateTransform.Angle = ViewModel.Drehwinkel;
+                }
+                else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                }
+                else
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                }
             }
-            else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
+            catch
             {
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;                
-            }
-            else
-            {
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;               
+
             }
         }
         private void Slider_GeodreieckAngel_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
@@ -734,7 +748,6 @@ namespace GeometrySketch
                 PenAttributesChanged();              
             }            
         }               
-
         private void Slider_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             PenAttributesChanged();
@@ -770,23 +783,27 @@ namespace GeometrySketch
             CurrentStrokeWidth = Slider_StrokeWidth.Value;
         }
 
-        PrintHelper printHelper;
+        //Print and Export
+        PrintHelper printHelper { get; set; }
         private async void AppBarButton_Print_Click(object sender, RoutedEventArgs e)
         {
-            var defaultPrintHelperOptions = new PrintHelperOptions();
-            
+            var defaultPrintHelperOptions = new PrintHelperOptions()
+            {
+                Orientation = PrintOrientation.Portrait
+            };            
             defaultPrintHelperOptions.AddDisplayOption(StandardPrintTaskOptions.Orientation);
-            defaultPrintHelperOptions.Orientation = PrintOrientation.Portrait;
-            
+                        
             printHelper = new PrintHelper(Container, defaultPrintHelperOptions);            
             
-            var grid = new Grid();
-            grid.Height = Grid_InkCanvas.Height;
-            grid.Width = Grid_InkCanvas.Width;
-            grid.Margin = Grid_InkCanvas.Margin;
-            grid.BorderThickness = Grid_InkCanvas.BorderThickness;
-            grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-            grid.VerticalAlignment = VerticalAlignment.Stretch;            
+            var grid = new Grid()
+            {
+                Height = Grid_InkCanvas.Height,
+                Width = Grid_InkCanvas.Width,
+                Margin = Grid_InkCanvas.Margin,
+                BorderThickness = Grid_InkCanvas.BorderThickness,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };            
 
             var rtb = new RenderTargetBitmap();
             await rtb.RenderAsync(Grid_InkCanvas);
@@ -801,18 +818,21 @@ namespace GeometrySketch
             encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
 
             await encoder.FlushAsync(); stream.Seek(0);
-
+                  
+            BitmapImage bimg = new BitmapImage();
+            await bimg.SetSourceAsync(stream);            
+            
             Image img = new Image()
             {
                 Width = Grid_InkCanvas.Width,
-                Height = Grid_InkCanvas.Height
-            };           
-            BitmapImage bimg = new BitmapImage();
-            await bimg.SetSourceAsync(stream);
-            img.Source = bimg;
+                Height = Grid_InkCanvas.Height,
+                Source = bimg
+            };
 
-            Viewbox vb = new Viewbox();            
-            vb.Child = grid;
+            Viewbox vb = new Viewbox()
+            {
+                Child = grid               
+            }; 
 
             grid.Children.Add(img);
 
@@ -823,11 +843,11 @@ namespace GeometrySketch
                        
             await printHelper.ShowPrintUIAsync("GeometrySketch");
         }
-        private void PrintHelper_OnPrintSucceeded()
+        private async void PrintHelper_OnPrintSucceeded()
         {
             printHelper.Dispose();
-            /*var dialog = new MessageDialog("Das Drucken war erfolgreich.");
-            await dialog.ShowAsync();*/
+            var dialog = new MessageDialog("Das Drucken war erfolgreich.");
+            await dialog.ShowAsync();
         }
         private async void PrintHelper_OnPrintFailed()
         {
@@ -837,11 +857,13 @@ namespace GeometrySketch
         }
         private async void AppBarButton_Exportjpeg_Click(object sender, RoutedEventArgs e)
         {
-            FileSavePicker savePicker = new FileSavePicker();
-            savePicker.SuggestedStartLocation = PickerLocationId.Desktop;
+            FileSavePicker savePicker = new FileSavePicker()
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop,                
+                DefaultFileExtension = ".jpeg",
+                SuggestedFileName = "Skizze"
+            };
             savePicker.FileTypeChoices.Add("jpeg", new List<string>() { ".jpeg" });
-            savePicker.DefaultFileExtension = ".jpeg";
-            savePicker.SuggestedFileName = "Skizze";
 
             StorageFile file = await savePicker.PickSaveFileAsync();
 
@@ -849,14 +871,16 @@ namespace GeometrySketch
             {
                 ViewModel.ProgressRingActive = true;
                 CachedFileManager.DeferUpdates(file);
-
-                var grid = new Grid();
-                grid.Height = Grid_InkCanvas.Height;
-                grid.Width = Grid_InkCanvas.Width;
-                grid.Margin = Grid_InkCanvas.Margin;
-                grid.BorderThickness = Grid_InkCanvas.BorderThickness;
-                grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-                grid.VerticalAlignment = VerticalAlignment.Stretch;
+                
+                var grid = new Grid()
+                {
+                    Height = Grid_InkCanvas.Height,
+                    Width = Grid_InkCanvas.Width,
+                    Margin = Grid_InkCanvas.Margin,
+                    BorderThickness = Grid_InkCanvas.BorderThickness,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
 
                 var rtb = new RenderTargetBitmap();
                 await rtb.RenderAsync(Grid_InkCanvas);
@@ -908,13 +932,15 @@ namespace GeometrySketch
                 ViewModel.ProgressRingActive = true;
                 CachedFileManager.DeferUpdates(file);
 
-                var grid = new Grid();
-                grid.Height = Grid_InkCanvas.Height;
-                grid.Width = Grid_InkCanvas.Width;
-                grid.Margin = Grid_InkCanvas.Margin;
-                grid.BorderThickness = Grid_InkCanvas.BorderThickness;
-                grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-                grid.VerticalAlignment = VerticalAlignment.Stretch;
+                var grid = new Grid()
+                {
+                    Height = Grid_InkCanvas.Height,
+                    Width = Grid_InkCanvas.Width,
+                    Margin = Grid_InkCanvas.Margin,
+                    BorderThickness = Grid_InkCanvas.BorderThickness,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
 
                 var rtb = new RenderTargetBitmap();
                 await rtb.RenderAsync(Grid_InkCanvas);
@@ -951,13 +977,15 @@ namespace GeometrySketch
         }
         private async void AppBarButton_Copy_Click(object sender, RoutedEventArgs e)
         {
-            var grid = new Grid();
-            grid.Height = Grid_InkCanvas.Height;
-            grid.Width = Grid_InkCanvas.Width;          
-            grid.Margin = Grid_InkCanvas.Margin;
-            grid.BorderThickness = Grid_InkCanvas.BorderThickness;
-            grid.HorizontalAlignment = HorizontalAlignment.Stretch;
-            grid.VerticalAlignment = VerticalAlignment.Stretch;
+            var grid = new Grid()
+            {
+                Height = Grid_InkCanvas.Height,
+                Width = Grid_InkCanvas.Width,
+                Margin = Grid_InkCanvas.Margin,
+                BorderThickness = Grid_InkCanvas.BorderThickness,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
 
             var rtb = new RenderTargetBitmap();
             await rtb.RenderAsync(Grid_InkCanvas); 
@@ -1011,7 +1039,7 @@ namespace GeometrySketch
         }
 
         private async void AppBarButton_Settings_Click(object sender, RoutedEventArgs e)
-        {
+        {            
             await CD_Settings.ShowAsync();
         }
         private void Theme_CheckedChangedAsync(object sender, RoutedEventArgs e)

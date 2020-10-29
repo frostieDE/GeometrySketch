@@ -72,8 +72,16 @@
                     </InkToolbarCustomToggleButton>
                 </AppBarElementContainer>
                 <AppBarSeparator/>
-                <AppBarButton x:Name="AppBarButton_Redo" Width="Auto" MinWidth="40" Icon="Redo" Label="Strich wiederherstellen" Click="AppBarButton_Redo_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
-                <AppBarButton x:Name="AppBarButton_Undo" Width="Auto" MinWidth="40" Icon="Undo" Label="Strich löschen" Click="AppBarButton_Undo_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Redo" Width="Auto" MinWidth="40" Icon="Redo" Label="Strich wiederherstellen" Click="AppBarButton_Redo_Click" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Y"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Undo" Width="Auto" MinWidth="40" Icon="Undo" Label="Strich löschen" Click="AppBarButton_Undo_Click" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Z"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarButton x:Name="AppBarButton_Delete" Width="Auto" MinWidth="40" Label="Seite leeren" Icon="Clear" Click="AppBarButton_Delete_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
                 <AppBarSeparator/>
                 <AppBarButton MinWidth="40" Label="Exportieren" Width="Auto" Style="{ThemeResource AppBarButtonRevealStyle}">
@@ -85,12 +93,32 @@
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton x:Name="AppBarButton_Copy" Click="AppBarButton_Copy_Click" MinWidth="40" Label="In Zwischenablage kopieren" Width="Auto" Icon="Copy" Style="{ThemeResource AppBarButtonRevealStyle}"/>
-                <AppBarButton x:Name="AppBarButton_Print" Click="AppBarButton_Print_Click" MinWidth="40" Label="Drucken" Width="Auto" Icon="Print" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_Copy" Click="AppBarButton_Copy_Click" MinWidth="40" Label="In Zwischenablage kopieren" Width="Auto" Icon="Copy" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="C"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Print" Click="AppBarButton_Print_Click" MinWidth="40" Label="Drucken" Width="Auto" Icon="Print" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarSeparator/>
-                <AppBarButton x:Name="AppBarButton_New" MinWidth="40" Label="Neue Seite erstellen" Width="Auto" Icon="NewFolder" Style="{ThemeResource AppBarButtonRevealStyle}" Click="AppBarButton_New_Click"/>
-                <AppBarButton x:Name="AppBarButton_Open" MinWidth="40" Label="Öffnen" HorizontalContentAlignment="Center" Click="AppBarButton_Open_Click" Width="Auto" Icon="OpenFile" Style="{ThemeResource AppBarButtonRevealStyle}"/>
-                <AppBarButton x:Name="AppBarButton_Save" MinWidth="40" Label="Speichern" Click="AppBarButton_Save_Click" Width="Auto" Icon="Save" Style="{ThemeResource AppBarButtonRevealStyle}"/>
+                <AppBarButton x:Name="AppBarButton_New" MinWidth="40" Label="Neue Seite erstellen" Width="Auto" Icon="NewFolder" Style="{ThemeResource AppBarButtonRevealStyle}" Click="AppBarButton_New_Click">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="N"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Open" MinWidth="40" Label="Öffnen" HorizontalContentAlignment="Center" Click="AppBarButton_Open_Click" Width="Auto" Icon="OpenFile" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="O"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Save" MinWidth="40" Label="Speichern" Click="AppBarButton_Save_Click" Width="Auto" Icon="Save" Style="{ThemeResource AppBarButtonRevealStyle}">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="S"/>
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <CommandBar.SecondaryCommands>
                     <AppBarButton LabelPosition="Collapsed" Label="Einstellungen" Icon="Setting" Click="AppBarButton_Settings_Click" Width="Auto"/>
                 </CommandBar.SecondaryCommands>
@@ -150,7 +178,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="290" MinWidth="180"/>
                 <ColumnDefinition Width="*" MinWidth="180"/>
-                <ColumnDefinition Width="200" MinWidth="180"/>
+                <ColumnDefinition Width="300" MinWidth="180"/>
             </Grid.ColumnDefinitions>
                 <TextBlock Text="Farben" Grid.Column="1" VerticalAlignment="Center"/>
                 <TextBlock Text="Größe" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
@@ -219,7 +247,7 @@
                     </StackPanel>
                     <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
                     <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
-                        <TextBlock Text="Version 1.1.0 entwickelt von" VerticalAlignment="Center"/>
+                        <TextBlock Text="Version 1.0.1 entwickelt von" VerticalAlignment="Center"/>
                         <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
                     </StackPanel>
                     <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/GeometrySketch" Margin="10,0,0,0"/>

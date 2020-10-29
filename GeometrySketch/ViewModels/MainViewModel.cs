@@ -45,8 +45,8 @@ namespace GeometrySketch.ViewModels
             Colors_BallpointPen = new BrushCollection()
             {
             new SolidColorBrush(Windows.UI.Colors.Black),
-            /*new SolidColorBrush(Windows.UI.Colors.White),
-            new SolidColorBrush(Windows.UI.Colors.LightGray),
+            new SolidColorBrush(Windows.UI.Colors.White),
+            /*new SolidColorBrush(Windows.UI.Colors.LightGray),
             new SolidColorBrush(Windows.UI.Colors.DarkGray),*/
             new SolidColorBrush(Windows.UI.Colors.Gray),
             //new SolidColorBrush(Windows.UI.Colors.DimGray),
@@ -81,8 +81,8 @@ namespace GeometrySketch.ViewModels
             Colors_Pencil = new BrushCollection()
             {
             new SolidColorBrush(Windows.UI.Colors.Black),
-            /*new SolidColorBrush(Windows.UI.Colors.White),
-            new SolidColorBrush(Windows.UI.Colors.LightGray),
+            new SolidColorBrush(Windows.UI.Colors.White),
+            /*new SolidColorBrush(Windows.UI.Colors.LightGray),
             new SolidColorBrush(Windows.UI.Colors.DarkGray),*/
             new SolidColorBrush(Windows.UI.Colors.Gray),
             //new SolidColorBrush(Windows.UI.Colors.DimGray),
@@ -318,6 +318,9 @@ namespace GeometrySketch.ViewModels
 
         private bool _themeSystem;
         public bool ThemeSystem { get { return _themeSystem; } set { _themeSystem = value; OnPropertyChanged(); } }
+
+        private ApplicationTheme _currentTheme;
+        public ApplicationTheme CurrentTheme {get { return _currentTheme; } set { _currentTheme = value; OnPropertyChanged();} }
 
         public bool InkPageSaveNecessity { get; set; }
 
