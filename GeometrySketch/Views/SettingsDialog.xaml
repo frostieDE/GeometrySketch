@@ -1,0 +1,45 @@
+﻿<ContentDialog 
+     x:Class="GeometrySketch.Views.SettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"    
+    Title="Einstellungen und Informationen" 
+    PrimaryButtonText="OK"
+    RequestedTheme="{x:Bind ViewModel.CurrentTheme,Mode=TwoWay}">
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Text="Darstellung" FontSize="16"/>
+            <RadioButton x:Name="RadioButton_Light" Margin="10,10,0,0" VerticalAlignment="Center" IsChecked="{x:Bind ViewModel.ThemeLight, Mode=TwoWay}" Content="Hell" GroupName="Theme"/>
+            <RadioButton x:Name="RadioButton_Dark" Margin="10,0,0,0" Content="Dunkel" IsChecked="{x:Bind ViewModel.ThemeDark, Mode=TwoWay}" GroupName="Theme"/>
+            <RadioButton x:Name="RadioButton_System" Margin="10,0,0,0" Content="Verwende Systemeinstellungen" IsChecked="{x:Bind ViewModel.ThemeSystem,Mode=TwoWay}" GroupName="Theme"/>
+            <TextBlock Text="Drittanbieter-Software" Margin="0,30,0,0" FontSize="16"/>
+            <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                <TextBlock Text="Newtonsoft Json v12.0.3 von James Newton King:" VerticalAlignment="Center"/>
+                <HyperlinkButton Content="EULA" NavigateUri="https://licenses.nuget.org/MIT" Margin="30,0,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                <TextBlock Text="Windows Community Toolkit v6.1.1:" VerticalAlignment="Center"/>
+                <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://github.com/windows-toolkit/WindowsCommunityToolkit/blob/master/license.md"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                <TextBlock Text="Microsoft.NetCore UWP v6.2.11:" VerticalAlignment="Center"/>
+                <HyperlinkButton Content="EULA" Margin="30,0,0,0" NavigateUri="https://github.com/Microsoft/dotnet/blob/master/releases/UWP/LICENSE.TXT"/>
+            </StackPanel>
+            <TextBlock Text="Bildnachweis" Margin="0,30,0,0" FontSize="16"/>
+            <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                <TextBlock Text="Geodreieck von Erik Streb" VerticalAlignment="Center"/>
+                <HyperlinkButton Content="EULA" NavigateUri="https://commons.wikimedia.org/wiki/File:Set_square_Geodreieck.svg" Margin="30,0,0,0" />
+            </StackPanel>
+            <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
+            <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                <TextBlock Text="Version 1.1.0 entwickelt von" VerticalAlignment="Center"/>
+                <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
+            </StackPanel>
+            <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/GeometrySketch" Margin="10,0,0,0"/>
+            <HyperlinkButton Content="Datenschutzhinweise" NavigateUri="https://github.com/HuHe86/GeometrySketch/blob/master/Datenschutzhinweise" Margin="10,0,0,0"/>
+            <HyperlinkButton Content="Bewertung abgeben" NavigateUri="ms-windows-store://review/?productid=9NKTD2J3H6N4" Margin="10,0,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

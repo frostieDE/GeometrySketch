@@ -21,7 +21,6 @@ namespace GeometrySketch.Commons
             return pt;
         }
 
-
         public static Point NearestPointOnGeodreieck(Point p1, Point p2, Point p3, Point p)
         {
             Point pt = new Point();
