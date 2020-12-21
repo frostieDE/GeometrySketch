@@ -9,14 +9,12 @@ namespace GeometrySketch.Commons
     {
         //Points on Cubic Bezier Curve siehe https://www.cubic.org/docs/bezier.htm
         public static Point lerp(Point a, Point b, float t)
-        {
-            Point p = new Point()
+        {            
+            return new Point()
             {
                 X = a.X + (b.X - a.X) * t,
                 Y = a.Y + (b.Y - a.Y) * t,
-
             };
-            return p;
         }
         public static Point bezier(Point a, Point b, Point c, Point d, float t)
         {
@@ -24,29 +22,24 @@ namespace GeometrySketch.Commons
             Point bc = new Point();
             Point cd = new Point();
             Point abbc = new Point();
-            Point bccd = new Point();
+            Point bccd = new Point();            
 
-            Point bezierPt = new Point();
+            ab = lerp(a, b, t);             // point between a and b
+            bc = lerp(b, c, t);             // point between b and c
+            cd = lerp(c, d, t);             // point between c and d
+            abbc = lerp(ab, bc, t);         // point between ab and bc
+            bccd = lerp(bc, cd, t);         // point between bc and cd
 
-            ab = lerp(a, b, t);           // point between a and b
-            bc = lerp(b, c, t);           // point between b and c
-            cd = lerp(c, d, t);           // point between c and d
-            abbc = lerp(ab, bc, t);       // point between ab and bc
-            bccd = lerp(bc, cd, t);       // point between bc and cd
-            bezierPt = lerp(abbc, bccd, t);   // point on the bezier-curve
-
-            return bezierPt;
+            return lerp(abbc, bccd, t);     // point on the bezier-curve
         }
         public static List<Point> PointsOnSegment(Point startPt, Point controlPt1, Point controlPt2, Point PositionPt)
         {
             List<Point> points = new List<Point>();
-            
+                        
             for (int i = 0; i < 10; i++)
-            {
-                Point p = new Point();
-                float t = (float)(i) / 9.0f;
-                p = bezier(startPt, controlPt1, controlPt2, PositionPt, t);
-                points.Add(p);
+            {                
+                float t = (float)(i) / 9.0f;               
+                points.Add(bezier(startPt, controlPt1, controlPt2, PositionPt, t));
             }
 
             return points;
@@ -61,9 +54,7 @@ namespace GeometrySketch.Commons
 
             foreach (InkStrokeRenderingSegment isrs in inst.GetRenderingSegments())
             {
-                List<Point> pointsOnSg = new List<Point>();
-                pointsOnSg = PointsOnSegment(points.Last(), isrs.BezierControlPoint1, isrs.BezierControlPoint2, isrs.Position);
-                points.AddRange(pointsOnSg);
+                points.AddRange(PointsOnSegment(points.Last(), isrs.BezierControlPoint1, isrs.BezierControlPoint2, isrs.Position));
             }
 
             return points;

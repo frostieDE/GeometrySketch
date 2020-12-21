@@ -14,9 +14,13 @@ namespace GeometrySketch.Model
         private int _maxY;
         public int MaxY { get => _maxY; set { _maxY = value; OnPropertyChanged(); } }
 
-        private int _originY;
-        public int OriginY { get => _originY; set { _originY = value; OnPropertyChanged(); } }
-        private int _originX;
-        public int OriginX { get => _originX; set { _originX = value; OnPropertyChanged(); } }
+        private int _originPositionY;
+        public int OriginPositionY { get => _originPositionY; set { _originPositionY = value; OnPropertyChanged(); } }
+        private int _originPositonX;
+        public int OriginPsoitionX { get => _originPositonX; set { _originPositonX = value; OnPropertyChanged(); } }
+
+        //lE in Kästchen
+        private int _lE;
+        public int LE { get => _lE; set { _lE = value; OnPropertyChanged(); } }
     }    
 }

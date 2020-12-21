@@ -16,20 +16,24 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
 using Windows.UI.Core;
+using System.Threading;
 
 namespace GeometrySketch.ViewModels
 {
     public class MainViewModel : Observable
     {
         public InkPage inkPage { get; private set; } = new InkPage();
-        public Settings Settings { get; private set; } = new Settings();        
+        public Settings Settings { get; private set; } = new Settings();
 
         private IInkPageDataprovider _inkPageDataProvider;
         private ISettingsDataProvider _settingsDataProvider;
 
-        public InkCanvas CurrentInkCanvas { get; set; }
-        public Rectangle Rectangle_Eraser { get; set; }
+        public InkCanvas CurrentInkCanvas { get; set; } = new InkCanvas();
+        public Rectangle Rectangle_Eraser { get; set; } = new Rectangle();
         public TranslateTransform TranslateTransform_Rectangle_Eraser { get; set; } = new TranslateTransform();
+
+        public Ellipse Ellipse_Laserpointer { get; set; } = new Ellipse();
+        public TranslateTransform TranslateTransform_Ellipse_Laserpointer { get; set; } = new TranslateTransform();
 
         //Undo Redo
         public UndoRedoBase UndoRedoBase { get; set; } = new UndoRedoBase();
@@ -91,19 +95,14 @@ namespace GeometrySketch.ViewModels
                 default:
                     ThemeSystem = true;
                     CurrentTheme = ElementTheme.Default;
-                    break;              
-            }            
+                    break;
+            }
         }
 
         public MainViewModel(IInkPageDataprovider inkPageDataProvider, ISettingsDataProvider settingsDataProvider, InkCanvas inkCanvas, Rectangle rectangle)
-        {            
+        {
             _settingsDataProvider = settingsDataProvider;
-            _inkPageDataProvider = inkPageDataProvider;
-
-            CurrentInkCanvas = new InkCanvas();
-            CurrentInkCanvas = inkCanvas;
-            Rectangle_Eraser = new Rectangle();
-            Rectangle_Eraser = rectangle;            
+            _inkPageDataProvider = inkPageDataProvider;            
 
             //DefaultColors
             Colors_BallpointPen = new BrushCollection()
@@ -114,7 +113,7 @@ namespace GeometrySketch.ViewModels
             new SolidColorBrush(Windows.UI.Colors.Red),
             new SolidColorBrush(Windows.UI.Colors.Orange),
             new SolidColorBrush(Windows.UI.Colors.Gold),
-            
+
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#A2E61B").Color),
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#008055").Color),
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#00AACC").Color),
@@ -145,7 +144,7 @@ namespace GeometrySketch.ViewModels
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#EC008C").Color),
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#FF5500").Color),
             new SolidColorBrush(ColorsHelper.GetColorFromHexa("#6600CC").Color),
-            };                                  
+            };
         }
 
         public bool SaveNecessity { get; set; } = false;
@@ -154,7 +153,7 @@ namespace GeometrySketch.ViewModels
         {
             try
             {
-                Settings = await _settingsDataProvider.AutoLoadSettingsAsync();                
+                Settings = await _settingsDataProvider.AutoLoadSettingsAsync();
                 UpdateViewModelSettings();
                 ProgressRingActive = false;
             }
@@ -186,17 +185,17 @@ namespace GeometrySketch.ViewModels
             if (file != null)
             {
                 ProgressRingActive = true;
-                await _inkPageDataProvider.OpenInkPageAsync(inkCanvas, inkPage, file);                
+                await _inkPageDataProvider.OpenInkPageAsync(inkCanvas, inkPage, file);
                 UpdateViewModel();
-                ProgressRingActive = false;               
+                ProgressRingActive = false;
             }
             else
             {
                 //Operation abgebrochen
-            }                       
+            }
         }
         public async Task FileOpenAsync(InkCanvas inkCanvas)
-        {            
+        {
             try
             {
                 var openPicker = new FileOpenPicker
@@ -210,9 +209,9 @@ namespace GeometrySketch.ViewModels
                 if (file != null)
                 {
                     ProgressRingActive = true;
-                    
+
                     await _inkPageDataProvider.OpenInkPageAsync(inkCanvas, inkPage, file);
-                    
+
                     // Add to FA without metadata
                     string faToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(file);
                     UpdateViewModel();
@@ -230,9 +229,9 @@ namespace GeometrySketch.ViewModels
             }
         }
         public async Task FileSaveAsync(InkCanvas inkCanvas)
-        {            
+        {
             try
-            {                
+            {
                 UpdateModel();
                 var savePicker = new FileSavePicker
                 {
@@ -276,145 +275,144 @@ namespace GeometrySketch.ViewModels
             {
                 ProgressRingActive = false;
             }
-        }                
-        
+        }
+
         //Eraser
         private int selectedEraser = 0;
         public int SelectedEraser { get { return selectedEraser; } set { selectedEraser = value; OnPropertyChanged(); } }
-
         private int eraserWidth = 8;
-        public int EraserWidth { get { return eraserWidth; } set { eraserWidth = value; OnPropertyChanged(); } }        
-        
-        public void EraserChanged(InkCanvas inkCanvas, Rectangle rectangle_Eraser, TranslateTransform translateTransform)
+        public int EraserWidth { get { return eraserWidth; } set { eraserWidth = value; OnPropertyChanged(); } }
+        public void ActivateEraser(InkCanvas inkCanvas, Rectangle rectangle_Eraser, TranslateTransform translateTransform)
         {
             CurrentInkCanvas = inkCanvas;
             Rectangle_Eraser = rectangle_Eraser;
-            TranslateTransform_Rectangle_Eraser = translateTransform;
+            TranslateTransform_Rectangle_Eraser = translateTransform;                        
+
             switch (SelectedEraser)
             {
                 case 0:
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.Erasing;
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.AllowProcessing;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed -= UnprocessedInput_PointerPressed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved -= UnprocessedInput_PointerMoved;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased -= UnprocessedInput_PointerReleased;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed -= UnprocessedInputEraser_PointerPressed;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved -= UnprocessedInputEraser_PointerMoved;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased -= UnprocessedInputEraser_PointerReleased;
                     break;
                 case 1:
                     EraserWidth = 12;
 
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.None;
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInput_PointerPressed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInput_PointerMoved;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInput_PointerReleased;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInputEraser_PointerPressed;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInputEraser_PointerMoved;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInputEraser_PointerReleased;
                     break;
                 case 2:
                     EraserWidth = 25;
 
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.None;
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInput_PointerPressed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInput_PointerMoved;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInput_PointerReleased;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInputEraser_PointerPressed;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInputEraser_PointerMoved;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInputEraser_PointerReleased;
                     break;
                 case 3:
                     EraserWidth = 37;
 
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.None;
                     CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInput_PointerPressed;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInput_PointerMoved;
-                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInput_PointerReleased;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInputEraser_PointerPressed;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInputEraser_PointerMoved;
+                    CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInputEraser_PointerReleased;
                     break;
-            }                
+            }           
         }
-
+        public void DeactivateEraser(object sender, RoutedEventArgs e)
+        {
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed -= UnprocessedInputEraser_PointerPressed;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved -= UnprocessedInputEraser_PointerMoved;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased -= UnprocessedInputEraser_PointerReleased;
+        }
         //EraseByPoint
         List<InkStroke> StrokesBefore { get; set; }
         List<InkStroke> StrokesAfter { get; set; }
-        private void UnprocessedInput_PointerPressed(InkUnprocessedInput sender, PointerEventArgs args)
+        public void ErasePoints(PointerEventArgs args)
         {
-            
+            try
+            {
+                List<InkStroke> SelectedStrokes = new List<InkStroke>();
+                foreach (InkStroke insr in CurrentInkCanvas.InkPresenter.StrokeContainer.GetStrokes())
+                {
+                    if (insr.Selected == true)
+                    {
+                        SelectedStrokes.Add(insr);
+                    }
+                }
+                for (int i = 0; i < SelectedStrokes.Count; i++)
+                {
+                    InkDrawingAttributes ida = SelectedStrokes[i].DrawingAttributes;
+
+                    List<Point> PointsA = new List<Point>();
+                    List<Point> PointsB = new List<Point>();
+
+                    bool IsA = true;
+
+                    foreach (Point pt in EraserHelper.GetPointsOnStroke(SelectedStrokes[i]))
+                    {
+                        if (EraserHelper.PointInRectangle(pt, args.CurrentPoint.RawPosition, EraserWidth) == true)
+                        {
+                            IsA = false;
+                        }
+                        else
+                        {
+                            if (IsA == true)
+                            {
+                                PointsA.Add(pt);
+                            }
+                            else
+                            {
+                                PointsB.Add(pt);
+                            }
+                        }
+                    }
+
+                    if (PointsA.Count > 0 || PointsB.Count > 0)
+                    {
+                        InkStrokeBuilder strokeBuilder = new InkStrokeBuilder();
+                        strokeBuilder.SetDefaultDrawingAttributes(ida);
+
+                        if (PointsA.Count > 0)
+                        {
+                            CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(strokeBuilder.CreateStroke(PointsA));
+
+                            if (PointsB.Count > 0)
+                            {
+                                CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(strokeBuilder.CreateStroke(PointsB));
+                            }
+                        }
+                        else
+                        {
+                            CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(strokeBuilder.CreateStroke(PointsB));
+                        }
+                    }
+                }
+                CurrentInkCanvas.InkPresenter.StrokeContainer.DeleteSelected();
+            }
+            catch { }
+        }
+        private void UnprocessedInputEraser_PointerPressed(InkUnprocessedInput sender, PointerEventArgs args)
+        {
             TranslateTransform_Rectangle_Eraser.X = (float)args.CurrentPoint.RawPosition.X - EraserWidth;
             TranslateTransform_Rectangle_Eraser.Y = (float)args.CurrentPoint.RawPosition.Y - EraserWidth;
             Rectangle_Eraser.Visibility = Visibility.Visible;
+            Ellipse_Laserpointer.Visibility = Visibility.Collapsed;
+
             StrokesBefore = new List<InkStroke>();
             foreach (InkStroke isk in CurrentInkCanvas.InkPresenter.StrokeContainer.GetStrokes())
             {
                 StrokesBefore.Add(isk);
             }
         }
-        public void ErasePoints(PointerEventArgs args)
-        {
-            List<InkStroke> SelectedStrokes = new List<InkStroke>();
-            foreach (InkStroke insr in CurrentInkCanvas.InkPresenter.StrokeContainer.GetStrokes())
-            {
-                if (insr.Selected == true)
-                {
-                    SelectedStrokes.Add(insr);
-                }
-            }
-
-            InkDrawingAttributes ida;
-            List<Point> pointsOnStroke;
-            List<Point> PointsA;
-            List<Point> PointsB;
-
-            for (int i = 0; i < SelectedStrokes.Count; i++)
-            {
-                ida = SelectedStrokes[i].DrawingAttributes;
-                pointsOnStroke = EraserHelper.GetPointsOnStroke(SelectedStrokes[i]);
-
-                PointsA = new List<Point>();
-                PointsB = new List<Point>();
-
-                bool IsA = true;
-
-                foreach (Point pt in pointsOnStroke)
-                {
-                    if (EraserHelper.PointInRectangle(pt, args.CurrentPoint.RawPosition, EraserWidth) == true)
-                    {
-                        IsA = false;
-                    }
-                    else
-                    {
-                        if (IsA == true)
-                        {
-                            PointsA.Add(pt);
-                        }
-                        else
-                        {
-                            PointsB.Add(pt);
-                        }
-                    }
-                }
-
-                if (PointsA.Count > 0 || PointsB.Count > 0)
-                {
-                    var strokeBuilder = new InkStrokeBuilder();
-                    strokeBuilder.SetDefaultDrawingAttributes(ida);
-
-                    if (PointsA.Count > 0)
-                    {
-                        InkStroke stkA = strokeBuilder.CreateStroke(PointsA);
-                        CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(stkA);
-
-                        if (PointsB.Count > 0)
-                        {
-                            InkStroke stkB = strokeBuilder.CreateStroke(PointsB);
-                            CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(stkB);
-                        }
-                    }
-                    else
-                    {
-                        InkStroke stkB = strokeBuilder.CreateStroke(PointsB);
-                        CurrentInkCanvas.InkPresenter.StrokeContainer.AddStroke(stkB);
-                    }
-                }
-            }
-            CurrentInkCanvas.InkPresenter.StrokeContainer.DeleteSelected();
-        }
-        private void UnprocessedInput_PointerMoved(InkUnprocessedInput sender, PointerEventArgs args)
+        private void UnprocessedInputEraser_PointerMoved(InkUnprocessedInput sender, PointerEventArgs args)
         {
             TranslateTransform_Rectangle_Eraser.X = (float)args.CurrentPoint.RawPosition.X - EraserWidth;
             TranslateTransform_Rectangle_Eraser.Y = (float)args.CurrentPoint.RawPosition.Y - EraserWidth;
@@ -424,25 +422,21 @@ namespace GeometrySketch.ViewModels
                 X = args.CurrentPoint.RawPosition.X - EraserWidth,
                 Y = args.CurrentPoint.RawPosition.Y - EraserWidth,
             };
-
             Point p2 = new Point()
             {
                 X = args.CurrentPoint.RawPosition.X + EraserWidth,
                 Y = args.CurrentPoint.RawPosition.Y - EraserWidth,
             };
-
             Point p3 = new Point()
             {
                 X = args.CurrentPoint.RawPosition.X + EraserWidth,
                 Y = args.CurrentPoint.RawPosition.Y + EraserWidth,
             };
-
             Point p4 = new Point()
             {
                 X = args.CurrentPoint.RawPosition.X - EraserWidth,
                 Y = args.CurrentPoint.RawPosition.Y + EraserWidth,
             };
-
             CurrentInkCanvas.InkPresenter.StrokeContainer.SelectWithLine(p1, p2);
             ErasePoints(args);
             CurrentInkCanvas.InkPresenter.StrokeContainer.SelectWithLine(p2, p3);
@@ -455,8 +449,8 @@ namespace GeometrySketch.ViewModels
             ErasePoints(args);
             CurrentInkCanvas.InkPresenter.StrokeContainer.SelectWithLine(p2, p4);
             ErasePoints(args);
-        }
-        private void UnprocessedInput_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
+        }            
+        private void UnprocessedInputEraser_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
         {
             Rectangle_Eraser.Visibility = Visibility.Collapsed;
             StrokesAfter = new List<InkStroke>();
@@ -464,17 +458,53 @@ namespace GeometrySketch.ViewModels
             {
                 StrokesAfter.Add(isk);
             }
+                        
+            UndoRedoBase.AddOperationToUndoneOperations(new EraseByPointOperation(StrokesBefore, StrokesAfter));
+        }
 
-            EraseByPointOperation eraseByPointOperation = new EraseByPointOperation(StrokesBefore, StrokesAfter);
-            UndoRedoBase.AddOperationToUndoneOperations(eraseByPointOperation);
+        //Laserpointer
+        public void ActivateLaserpointer(InkCanvas inkCanvas, Ellipse ellipse_Laserpointer, TranslateTransform translateTransform)
+        {
+            CurrentInkCanvas = inkCanvas;
+            Ellipse_Laserpointer = ellipse_Laserpointer;
+            TranslateTransform_Ellipse_Laserpointer = translateTransform;            
+            
+            CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.None;
+            CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
+
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInputLaserpointer_PointerPressed;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInputLaserpointer_PointerMoved;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInputLaserpointer_PointerReleased;
+        }
+        public void DeactivateLaserpointer(object sender, RoutedEventArgs e)
+        {
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerPressed -= UnprocessedInputLaserpointer_PointerPressed;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved -= UnprocessedInputLaserpointer_PointerMoved;
+            CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased -= UnprocessedInputLaserpointer_PointerReleased;
+        }
+        private void UnprocessedInputLaserpointer_PointerPressed(InkUnprocessedInput sender, PointerEventArgs args)
+        {
+            TranslateTransform_Ellipse_Laserpointer.X = (float)args.CurrentPoint.RawPosition.X - 12.5;
+            TranslateTransform_Ellipse_Laserpointer.Y = (float)args.CurrentPoint.RawPosition.Y - 12.5;
+            Ellipse_Laserpointer.Visibility = Visibility.Visible;
+            Rectangle_Eraser.Visibility = Visibility.Collapsed;
+        }
+        private void UnprocessedInputLaserpointer_PointerMoved(InkUnprocessedInput sender, PointerEventArgs args)
+        {
+            TranslateTransform_Ellipse_Laserpointer.X = (float)args.CurrentPoint.RawPosition.X - 12.5;
+            TranslateTransform_Ellipse_Laserpointer.Y = (float)args.CurrentPoint.RawPosition.Y - 12.5;            
+        }
+        private void UnprocessedInputLaserpointer_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
+        {
+            Ellipse_Laserpointer.Visibility = Visibility.Collapsed;            
         }
 
         //InkingToolsPropertiers      
         private InkToolbarPenButton _selectedPen;
         public InkToolbarPenButton SelectedPen { get { return _selectedPen; } set { _selectedPen = value; OnPropertyChanged();  } }
         
-        private int selectedPenIndex = 0;
-        public int SelectedPenIndex { get { return selectedPenIndex; } set { selectedPenIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(InkingToolsDetailsVisibility)); } }
+        private int selectedInkingToolIndex = 0;
+        public int SelectedInkingToolIndex { get { return selectedInkingToolIndex; } set { selectedInkingToolIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(InkingToolsDetailsVisibility)); } }
 
         private BrushCollection colors_BallpointPen;
         public BrushCollection Colors_BallpointPen { get { return colors_BallpointPen; } set { colors_BallpointPen = value; OnPropertyChanged(); } }
@@ -484,7 +514,7 @@ namespace GeometrySketch.ViewModels
         public BrushCollection Colors_Highlighter { get { return colors_Highlighter; } set { colors_Highlighter = value; OnPropertyChanged(); } }
 
         //InkingToolsDetailsProperties
-        public Visibility InkingToolsDetailsVisibility { get { if (SelectedPenIndex != 3) { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
+        public Visibility InkingToolsDetailsVisibility { get { if (SelectedInkingToolIndex == 3 || SelectedInkingToolIndex == 4) { return Visibility.Collapsed; } else { return Visibility.Visible; } } }
 
         private double currentStrokeWidth = 1;
         public double CurrentStrokeWidth { get { return currentStrokeWidth; } set { currentStrokeWidth = value; OnPropertyChanged(); } }
@@ -501,13 +531,13 @@ namespace GeometrySketch.ViewModels
 
             da.Color = cl;
 
-            if (SelectedPenIndex == 1)
+            if (SelectedInkingToolIndex == 1)
             {
                 da = InkDrawingAttributes.CreateForPencil();
             }
 
             da.Color = cl;
-            da.Size = new Windows.Foundation.Size(SelectedPen.SelectedStrokeWidth, SelectedPen.SelectedStrokeWidth);
+            da.Size = new Size(SelectedPen.SelectedStrokeWidth, SelectedPen.SelectedStrokeWidth);
             da.IgnorePressure = true;
             UpdatePreviewInkStroke(da);
             PreviewInkStrokeCanvas.InkPresenter.StrokeContainer.AddStroke(PreviewInkStroke);            
@@ -519,7 +549,7 @@ namespace GeometrySketch.ViewModels
             var strokePreviewInkPoints = new List<InkPoint>();
             for (var i = 0; i < Commons.Constants.PreviewStrokeCoordinates.Length; i += 2)
             {
-                var newPoint = new Windows.Foundation.Point(Commons.Constants.PreviewStrokeCoordinates[i], Commons.Constants.PreviewStrokeCoordinates[i + 1] + 10);
+                var newPoint = new Point(Commons.Constants.PreviewStrokeCoordinates[i], Commons.Constants.PreviewStrokeCoordinates[i + 1] + 10);
                 var inkPoint = new InkPoint(newPoint, 1f);
                 strokePreviewInkPoints.Add(inkPoint);
             }
@@ -530,14 +560,14 @@ namespace GeometrySketch.ViewModels
         }
         public void UpdatePreviewInkStroke(InkDrawingAttributes ida)
         {
-            InkDrawingAttributes inkDrawingAttributes = new InkDrawingAttributes();
-            inkDrawingAttributes = ida;
+            InkDrawingAttributes inkConstructionAttributes = new InkDrawingAttributes();
+            inkConstructionAttributes = ida;
 
             if (PreviewInkStroke == null)
             {
                 CreatePreviewInkStroke();
             }
-            PreviewInkStroke.DrawingAttributes = inkDrawingAttributes;
+            PreviewInkStroke.DrawingAttributes = inkConstructionAttributes;
 
             InkStrokeContainer strokeContainer = PreviewStrokeContainer;
             if (strokeContainer == null)
@@ -557,11 +587,15 @@ namespace GeometrySketch.ViewModels
         }
 
 
-        //DrawingToolsDetails (Geodreieck, Zirkel, Lineal)
-        private string _selectedDrawingTool = "";
-        public string SelectedDrawingTool { get { return _selectedDrawingTool; } set { _selectedDrawingTool = value; OnPropertyChanged(); OnPropertyChanged(nameof(DrawingToolsDetailsVisibility)); } }
-                
-        public Visibility DrawingToolsDetailsVisibility { get { if (SelectedDrawingTool != "") { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
+        //ConstructionTools (Lineal, Geodreieck, Zirkel)
+        private string _selectedConstructionTool = "";
+        public string SelectedConstructionTool { get { return _selectedConstructionTool; } set { _selectedConstructionTool = value; OnPropertyChanged(); } }
+
+        //0 = None, 1 = Lineal, 2 = Geodreieck 3 = Zirkel 
+        private int selectedConstructionToolsIndex = 0;
+        public int SelectedConstructionToolsIndex { get { return selectedConstructionToolsIndex; } set { selectedConstructionToolsIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(ConstructionToolsDetailsVisibility)); } }
+
+        public Visibility ConstructionToolsDetailsVisibility { get { if (SelectedConstructionToolsIndex != 0) { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
 
         //GeodreieckProperties
         private double _geodreieckDrehwinkel;
@@ -618,6 +652,22 @@ namespace GeometrySketch.ViewModels
         //GlobalProgressRing
         private bool _progressRingActive = false;
         public bool ProgressRingActive { get { return _progressRingActive; } set { _progressRingActive = value; OnPropertyChanged(); } }
+
+        //Koordinatensystem
+        public List<Koordinatensystem> Koordinatensysteme { get; set; } = new List<Koordinatensystem>();
+
+        public Koordinatensystem CurrentKoordinatensystem { get; set; }
+
+        public void UpdateKoordinatensysteme()
+        {
+
+        }
+
+        public void TranslateCurrentKoordinatensystem()
+        {
+
+        }
+
 
         //SettingsViewModel
         private bool _themeLight;

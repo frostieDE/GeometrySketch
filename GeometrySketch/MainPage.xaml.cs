@@ -91,6 +91,8 @@ namespace GeometrySketch
             InkCanvas_GeometrySketch.InkPresenter.UnprocessedInput.PointerEntered += UnprocessedInput_PointerEntered;
         }               
 
+
+
         //AppLifeCycle and DataEvents
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -109,27 +111,31 @@ namespace GeometrySketch
             e.Handled = true;
             if (SaveNecessity == true)
             {
-                ContentDialogResult result = await CD_SaveQuery.ShowAsync();
+                try
+                {
+                    ContentDialogResult result = await CD_SaveQuery.ShowAsync();
 
-                if (result == ContentDialogResult.Primary)
-                {
-                    await ViewModel.FileSaveAsync(InkCanvas_GeometrySketch);
-                    await ViewModel.AutoSaveAsync();
-                    ViewModel.ProgressRingActive = false;
-                    deferral.Complete();
-                    Application.Current.Exit();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        await ViewModel.FileSaveAsync(InkCanvas_GeometrySketch);
+                        await ViewModel.AutoSaveAsync();
+                        ViewModel.ProgressRingActive = false;
+                        deferral.Complete();
+                        Application.Current.Exit();
+                    }
+                    else if (result == ContentDialogResult.Secondary)
+                    {
+                        ViewModel.ProgressRingActive = false;
+                        await ViewModel.AutoSaveAsync();
+                        deferral.Complete();
+                        Application.Current.Exit();
+                    }
+                    else
+                    {
+                        deferral.Complete();
+                    }
                 }
-                else if (result == ContentDialogResult.Secondary)
-                {
-                    ViewModel.ProgressRingActive = false;
-                    await ViewModel.AutoSaveAsync();
-                    deferral.Complete();
-                    Application.Current.Exit();
-                }
-                else
-                {
-                    deferral.Complete();
-                }
+                catch { }
             }
             else
             {
@@ -171,33 +177,40 @@ namespace GeometrySketch
             SaveNecessity = false;
         }
         
+
+
         //InkinkToolsChanged        
         private void InkToolbar_ActiveToolChanged(InkToolbar sender, object args)
         {            
             if (BallPointPen_Button.IsChecked == true)
             {
-                ViewModel.SelectedPenIndex = 0;
+                ViewModel.SelectedInkingToolIndex = 0;
                 ViewModel.SelectedPen = BallPointPen_Button;                
             }
             else if (Pencil_Button.IsChecked == true)
             {
-                ViewModel.SelectedPenIndex = 1;
+                ViewModel.SelectedInkingToolIndex = 1;
                 ViewModel.SelectedPen = Pencil_Button;                
             }
             else if (Highlighter_Button.IsChecked == true)
             {
-                ViewModel.SelectedPenIndex = 2;
+                ViewModel.SelectedInkingToolIndex = 2;
                 ViewModel.SelectedPen = Highlighter_Button;                
+            }            
+            else if (Laserpointer_Button.IsChecked == true)
+            {
+                ViewModel.SelectedInkingToolIndex = 3;
+                ViewModel.ActivateLaserpointer(InkCanvas_GeometrySketch, Ellipse_Laserpointer, TranslateTransform_Ellipse_Laserpointer);
             }
             else if (Eraser_Button.IsChecked == true)
             {
-                ViewModel.SelectedPenIndex = 3;
-                ViewModel.SelectedPen = Eraser_Button;                
-                ViewModel.EraserChanged(InkCanvas_GeometrySketch, Rectangle_Eraser, TranslateTransform_Rectangle_Eraser);
+                ViewModel.SelectedInkingToolIndex = 4;
+                ViewModel.ActivateEraser(InkCanvas_GeometrySketch, Rectangle_Eraser, TranslateTransform_Rectangle_Eraser);
             }
-            if(IsInkingToolAutoChanged != true)
+
+            if (IsInkingToolAutoChanged != true)
             {
-                LastInkingTool = ViewModel.SelectedPenIndex;
+                LastInkingTool = ViewModel.SelectedInkingToolIndex;
             }                    
 
             GridView_Colors.DataContext = null;
@@ -210,8 +223,9 @@ namespace GeometrySketch
         }
         private void ListViewEraser_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ViewModel.EraserChanged(InkCanvas_GeometrySketch, Rectangle_Eraser, TranslateTransform_Rectangle_Eraser);
-        }        
+            ViewModel.ActivateEraser(InkCanvas_GeometrySketch, Rectangle_Eraser, TranslateTransform_Rectangle_Eraser);
+        }
+
         //Register Pen Turning
         private int LastInkingTool { get; set; }
         private void SelectLastInkingTool()
@@ -226,8 +240,11 @@ namespace GeometrySketch
                     break;
                 case 2:
                     Highlighter_Button.IsChecked = true;
-                    break;
+                    break;                
                 case 3:
+                    Laserpointer_Button.IsChecked = true;
+                    break;
+                case 4:
                     Eraser_Button.IsChecked = true;
                     break;
                 default:
@@ -249,19 +266,12 @@ namespace GeometrySketch
                 IsInkingToolAutoChanged = true;
                 SelectLastInkingTool();                
             }            
-        }
-        private void AppBarButton_Delete_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteAllOperation dao = new DeleteAllOperation(InkCanvas_GeometrySketch.InkPresenter.StrokeContainer.GetStrokes());
-            ViewModel.UndoRedoBase.AddOperationToUndoneOperations(dao);
+        }        
 
-            InkCanvas_GeometrySketch.InkPresenter.StrokeContainer.Clear();
 
-            SaveNecessity = true;
-        }
 
-        //DrawingTools(Geodreieck, Zirkel und Lineal) selection changed
-        private void DrawingTools_Checked(object sender, RoutedEventArgs e)
+        //ConstructionTools(Geodreieck, Zirkel und Lineal) selection changed
+        private void ConstructionTools_Checked(object sender, RoutedEventArgs e)
         {
             var drt = (InkToolbarCustomToggleButton)sender;
 
@@ -270,13 +280,44 @@ namespace GeometrySketch
                 PeriodicTimer?.Cancel();
                 ITBCTB_Zirkel.IsChecked = false;
                 ITBCTB_Geodreieck.IsChecked = false;
-                ViewModel.SelectedDrawingTool = "Lineal";
+
+                ViewModel.SelectedConstructionTool = "Lineal";
+                ViewModel.SelectedConstructionToolsIndex = 1;
+            }
+            else if (drt == ITBCTB_Geodreieck)
+            {
+                PeriodicTimer?.Cancel();
+
+                ITBCTB_Lineal.IsChecked = false;
+                ITBCTB_Zirkel.IsChecked = false;
+
+                ViewModel.SelectedConstructionTool = "Geodreieck";
+                ViewModel.SelectedConstructionToolsIndex = 2;
+
+                //Reset Geodreieck Position
+                _dz.X = 800;
+                _dz.Y = 799;
+                ViewModel.GeodreieckDrehwinkel = 0;
+                Geodreieck_TranslateTransform.Y = 0;
+                Geodreieck_TranslateTransform.X = 0;
+                Geodreieck_RotateTransform.Angle = 0;
+                ViewModel.GeodreieckVisibilty = Visibility.Visible;
+
+                coreInkIndependentInputSource.PointerHovering += coreInkIndependentInputSource_PointerHovering;
+                Geodreieck.PointerMoved += Geodreieck_PointerMoved;
+
+                coreWetStrokeUpdateSource.WetStrokeStarting += coreWetStrokeUpdateSource_StrokeStarting;
+                coreWetStrokeUpdateSource.WetStrokeContinuing += coreWetStrokeUpdateSource_StrokeContinuing;
+                coreWetStrokeUpdateSource.WetStrokeStopping += coreWetStrokeUpdateSource_StrokeStopping;
             }
             else if (drt == ITBCTB_Zirkel)
             {
                 ITBCTB_Lineal.IsChecked = false;
                 ITBCTB_Geodreieck.IsChecked = false;
-                ViewModel.SelectedDrawingTool = "Zirkel";
+
+                ViewModel.SelectedConstructionTool = "Zirkel";
+                ViewModel.SelectedConstructionToolsIndex = 3;
+
                 try
                 {
                     PeriodicTimer = ThreadPoolTimer.CreatePeriodicTimer((source) =>
@@ -291,38 +332,14 @@ namespace GeometrySketch
                 catch
                 {
 
-                }
-            }
-            else if (drt == ITBCTB_Geodreieck)
-            {
-                PeriodicTimer?.Cancel();
-                ITBCTB_Lineal.IsChecked = false;
-                ITBCTB_Zirkel.IsChecked = false;
-
-                ViewModel.SelectedDrawingTool = "Geodreieck";
-
-                _dz.X = 800;
-                _dz.Y = 799;
-                ViewModel.GeodreieckDrehwinkel = 0;
-                Geodreieck_TranslateTransform.Y = 0;
-                Geodreieck_TranslateTransform.X = 0;
-                Geodreieck_RotateTransform.Angle = 0;
-                ViewModel.GeodreieckVisibilty = Visibility.Visible;
-
-
-                coreInkIndependentInputSource.PointerHovering += coreInkIndependentInputSource_PointerHovering;
-                Geodreieck.PointerMoved += Geodreieck_PointerMoved;
-
-                coreWetStrokeUpdateSource.WetStrokeStarting += coreWetStrokeUpdateSource_StrokeStarting;
-                coreWetStrokeUpdateSource.WetStrokeContinuing += coreWetStrokeUpdateSource_StrokeContinuing;
-                coreWetStrokeUpdateSource.WetStrokeStopping += coreWetStrokeUpdateSource_StrokeStopping;
-            }
+                }            
+            }            
         }
-        private void DrawingTools_Unchecked(object sender, RoutedEventArgs e)
+        private void ConstructionTools_Unchecked(object sender, RoutedEventArgs e)
         {
             PeriodicTimer?.Cancel();
-            ViewModel.SelectedDrawingTool = "";
-            ViewModel.GeodreieckVisibilty = Visibility.Collapsed;
+            ViewModel.SelectedConstructionTool = "";
+            ViewModel.SelectedConstructionToolsIndex = 0;
 
             coreInkIndependentInputSource.PointerHovering -= coreInkIndependentInputSource_PointerHovering;
             Geodreieck.PointerMoved -= Geodreieck_PointerMoved;
@@ -332,6 +349,40 @@ namespace GeometrySketch
             coreWetStrokeUpdateSource.WetStrokeStopping -= coreWetStrokeUpdateSource_StrokeStopping;
         }
 
+
+
+        //Activate PointerEvents in InkCanvas for the DeltaManipulation of Geodreieck      
+        private CoreInkIndependentInputSource coreInkIndependentInputSource { get; set; }
+        private async void coreInkIndependentInputSource_PointerHovering(CoreInkIndependentInputSource sender, PointerEventArgs args)
+        {
+            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, args.CurrentPoint.RawPosition) == true)
+            {
+                await CurrentThread.RunAsync(CoreDispatcherPriority.High, () =>
+                {
+                    Geodreieck.IsHitTestVisible = true;
+                });
+            }
+            else
+            {
+                await CurrentThread.RunAsync(CoreDispatcherPriority.High, () =>
+                {
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                });
+            }
+        }
+        private void Geodreieck_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, e.GetCurrentPoint(InkCanvas_GeometrySketch).RawPosition) == false)
+            {
+                Geodreieck.IsHitTestVisible = false;
+
+                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+            }
+        }
         //Geodreieck DeltaManipulation
         private Point _dz = new Point(800, 799);
         public Point DZ { get { return _dz; } set { _dz = value; } }
@@ -339,7 +390,7 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                Point p = new Point()
                 {
                     X = _dz.X + Math.Cos((180 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800,
                     Y = _dz.Y - Math.Sin((180 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800
@@ -351,7 +402,7 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                Point p = new Point()
                 {
                     X = _dz.X + Math.Cos((-ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800,
                     Y = _dz.Y - Math.Sin((-ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800
@@ -363,7 +414,7 @@ namespace GeometrySketch
         {
             get
             {
-                Windows.Foundation.Point p = new Windows.Foundation.Point()
+                Point p = new Point()
                 {
                     X = _dz.X + Math.Cos((90 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 799,
                     Y = _dz.Y - Math.Sin((90 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 799
@@ -419,56 +470,13 @@ namespace GeometrySketch
             Geodreieck_RotateTransform.CenterY = _dz.Y;
             Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
         }
-        private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
-        {
-            try
-            {
-                Windows.Foundation.Point pt = new Windows.Foundation.Point()
-                {
-                    X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
-                    Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
-                };
-
-                if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
-                {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
-
-                    var pointer = e.GetCurrentPoint(Grid_InkCanvas);
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - pointer.Properties.MouseWheelDelta / 120;
-
-                    Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
-
-                    Geodreieck_RotateTransform.CenterX = _dz.X;
-                    Geodreieck_RotateTransform.CenterY = _dz.Y;
-                    Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
-                }
-                else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
-                {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
-                }
-                else
-                {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
-                }
-            }
-            catch
-            {
-
-            }
-        }
         private void Geodreieck_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
-            Windows.Foundation.Point p = new Windows.Foundation.Point()
+            Point p = new Point()
             {
                 X = e.Position.X,
                 Y = e.Position.Y,
-            };
+            };            
 
             if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true)
             {
@@ -477,136 +485,25 @@ namespace GeometrySketch
         }
         private void Geodreieck_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            Polygon_GeodreieckBackground.Opacity = 0.75;
-            this.Focus(FocusState.Programmatic);
+            Polygon_GeodreieckBackground.Opacity = 0.75;            
         }
-
-        private void InkCanvas_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
-        {
-            Windows.Foundation.Point p = new Windows.Foundation.Point()
-            {
-                X = e.Position.X,
-                Y = e.Position.Y,
-            };
-
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == false)
-            {
-                double x = e.Delta.Translation.X;
-                double y = e.Delta.Translation.Y;
-                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
-                ScaleFactor *= e.Delta.Scale;
-
-                if (Math.Abs(x) > Math.Abs(y))
-                {
-                    ScrollViewer_InkCanvas.ChangeView(ScrollViewer_InkCanvas.HorizontalOffset - x, null, ScaleFactor);
-                }
-                else
-                {
-                    ScrollViewer_InkCanvas.ChangeView(null, ScrollViewer_InkCanvas.VerticalOffset - y, ScaleFactor);
-                }
-                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
-            }
-            else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && ViewModel.GeodreieckVisibilty == Visibility.Visible)
-            {
-                double x, y, dw;
-                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
-
-                x = 1 / ScaleFactor * e.Delta.Translation.X;
-                y = 1 / ScaleFactor * e.Delta.Translation.Y;
-                dw = Math.Round(e.Delta.Rotation, 1);
-
-                Geodreieck_TranslateTransform.X = Geodreieck_TranslateTransform.X + x;
-                Geodreieck_TranslateTransform.Y = Geodreieck_TranslateTransform.Y + y;
-
-                _dz.X = _dz.X + x;
-                _dz.Y = _dz.Y + y;
-
-                ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel + dw;
-                if (ViewModel.GeodreieckDrehwinkel >= 360)
-                {
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - 360;
-                }
-
-                //Bindung an Koordinatenachsen
-                if (-0.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 0.5)
-                {
-                    ViewModel.GeodreieckDrehwinkel = 0;
-                }
-                else if (89.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 90.5)
-                {
-                    ViewModel.GeodreieckDrehwinkel = 90;
-                }
-                else if (179.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 180.5)
-                {
-                    ViewModel.GeodreieckDrehwinkel = 180;
-                }
-                else if (269.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 270.5)
-                {
-                    ViewModel.GeodreieckDrehwinkel = 270;
-                }
-                else if (359.5 <= ViewModel.GeodreieckDrehwinkel)
-                {
-                    ViewModel.GeodreieckDrehwinkel = 0;
-                }
-
-                Slider_GeodreieckAngel.Value = Math.Round(360 - ViewModel.GeodreieckDrehwinkel, 0);
-                if (Slider_GeodreieckAngel.Value == 360)
-                {
-                    Slider_GeodreieckAngel.Value = 0;
-                }
-
-                Geodreieck_RotateTransform.CenterX = _dz.X;
-                Geodreieck_RotateTransform.CenterY = _dz.Y;
-                Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
-            }
-            else
-            {
-                double x = e.Delta.Translation.X;
-                double y = e.Delta.Translation.Y;
-                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
-                ScaleFactor *= e.Delta.Scale;
-
-                if (Math.Abs(x) > Math.Abs(y))
-                {
-                    ScrollViewer_InkCanvas.ChangeView(ScrollViewer_InkCanvas.HorizontalOffset - x, null, ScaleFactor);
-                }
-                else
-                {
-                    ScrollViewer_InkCanvas.ChangeView(null, ScrollViewer_InkCanvas.VerticalOffset - y, ScaleFactor);
-                }
-                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
-            }
-        }
-        private void InkCanvas_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
             try
             {
-                Point pt = new Point()
+                if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
                 {
-                    X = e.GetCurrentPoint(Grid_InkCanvas).Position.X,
-                    Y = e.GetCurrentPoint(Grid_InkCanvas).Position.Y
-                };
-
-                if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
-                {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
-
-                    var pointer = e.GetCurrentPoint(Grid_InkCanvas);
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - pointer.Properties.MouseWheelDelta / 120;
+                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta / 120;
 
                     Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
 
                     Geodreieck_RotateTransform.CenterX = _dz.X;
                     Geodreieck_RotateTransform.CenterY = _dz.Y;
                     Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
-                }
-                else if (GeometryHelper.PointIsInPolygon(P1, P2, P3, pt) == true && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == true)
-                {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+
+                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
+                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
                 }
                 else
                 {
@@ -628,60 +525,70 @@ namespace GeometrySketch
             Geodreieck_RotateTransform.CenterY = _dz.Y;
             Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
         }
-        
-        //Aktiviert PointerEvents im InkCanvas für DeltaManipulation des Geodreiecks        
-        private CoreInkIndependentInputSource coreInkIndependentInputSource { get; set; }
-        private async void coreInkIndependentInputSource_PointerHovering(CoreInkIndependentInputSource sender, PointerEventArgs args)
+        //Enables MouseInput and Scroll-Ability by Touch        
+        private void InkCanvas_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, args.CurrentPoint.RawPosition) == true)
+            Point p = new Point()
             {
-                await CurrentThread.RunAsync(CoreDispatcherPriority.High, () =>
-                {
-                    Geodreieck.IsHitTestVisible = true;
-                });
-            }
-        }
-        private void Geodreieck_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-            Windows.Foundation.Point p = new Windows.Foundation.Point()
-            {
-                X = e.GetCurrentPoint(InkCanvas_GeometrySketch).Position.X,
-                Y = e.GetCurrentPoint(InkCanvas_GeometrySketch).Position.Y,
-            };
+                X = e.Position.X,
+                Y = e.Position.Y,
+            };           
 
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == false)
+            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && ViewModel.GeodreieckVisibilty == Visibility.Visible)
             {
-                Geodreieck.IsHitTestVisible = false;
+                Geodreieck_ManipulationDelta(sender, e);
             }
-        }
+            else
+            {
+                double x = e.Delta.Translation.X;
+                double y = e.Delta.Translation.Y;
+                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
+                ScaleFactor *= e.Delta.Scale;
+
+                if (Math.Abs(x) > Math.Abs(y))
+                {
+                    ScrollViewer_InkCanvas.ChangeView(ScrollViewer_InkCanvas.HorizontalOffset - x, null, ScaleFactor);
+                }
+                else
+                {
+                    ScrollViewer_InkCanvas.ChangeView(null, ScrollViewer_InkCanvas.VerticalOffset - y, ScaleFactor);
+                }
+                ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
+            }
+        }        
+        
         //Snap to Geodreieck
         private bool Snap { get; set; }
         private bool IsInkSpace { get; set; }
         CoreWetStrokeUpdateSource coreWetStrokeUpdateSource { get; set; }
         private void SnapPoints(IList<InkPoint> newInkPoints)
         {
-            Windows.Foundation.Point p = new Windows.Foundation.Point();
-
-            for (int i = 0; i < newInkPoints.Count; i++)
+            try
             {
-                p.X = newInkPoints[i].Position.X;
-                p.Y = newInkPoints[i].Position.Y;
-                if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == false)
+                Point p = new Point();
+
+                for (int i = 0; i < newInkPoints.Count; i++)
                 {
-                    Windows.Foundation.Point pt = GeometryHelper.NearestPointOnGeodreieck(P1, P2, P3, p);
-                    Windows.Foundation.Point np = GeometryHelper.NewInkPoint(pt, p, ViewModel.CurrentStrokeWidth);
-                    newInkPoints[i] = new InkPoint(np, newInkPoints[i].Pressure);
-                }
-                else
-                {
-                    newInkPoints.RemoveAt(i);
+                    p.X = newInkPoints[i].Position.X;
+                    p.Y = newInkPoints[i].Position.Y;
+                    if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == false)
+                    {
+                        Point pt = GeometryHelper.NearestPointOnGeodreieck(P1, P2, P3, p);
+                        Point np = GeometryHelper.NewInkPoint(pt, p, ViewModel.CurrentStrokeWidth);
+                        newInkPoints[i] = new InkPoint(np, newInkPoints[i].Pressure);
+                    }
+                    else
+                    {
+                        newInkPoints.RemoveAt(i);
+                    }
                 }
             }
+            catch { }
         }
         private void coreWetStrokeUpdateSource_StrokeStarting(CoreWetStrokeUpdateSource sender, CoreWetStrokeUpdateEventArgs args)
         {
             InkPoint firstPoint = args.NewInkPoints.First();
-            Windows.Foundation.Point p = new Windows.Foundation.Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
+            Point p = new Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
 
             if (GeometryHelper.MinimalDistanceToGeodreieck(P1, P2, P3, p) <= 72)
             {
@@ -707,7 +614,7 @@ namespace GeometrySketch
             if (args.NewInkPoints.Count > 0)
             {
                 InkPoint firstPoint = args.NewInkPoints.First();
-                Windows.Foundation.Point p = new Windows.Foundation.Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
+                Point p = new Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
                 if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true)
                 {
                     IsInkSpace = false;
@@ -730,7 +637,7 @@ namespace GeometrySketch
             if (args.NewInkPoints.Count > 0)
             {
                 InkPoint firstPoint = args.NewInkPoints.First();
-                Windows.Foundation.Point p = new Windows.Foundation.Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
+                Point p = new Point() { X = firstPoint.Position.X, Y = firstPoint.Position.Y };
                 if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true)
                 {
                     IsInkSpace = false;
@@ -754,18 +661,32 @@ namespace GeometrySketch
         public TimeSpan period { get; set; } = TimeSpan.FromSeconds(0.01);
         public ThreadPoolTimer PeriodicTimer { get; set; }
 
-        //Undo, Redo, SaveNecessity
+
+
+        //Undo, Redo
         private void AppBarButton_Undo_Click(object sender, RoutedEventArgs e)
-        {            
-            ViewModel.UndoRedoBase.Undo(InkCanvas_GeometrySketch);
+        {
+            try { ViewModel.UndoRedoBase.Undo(InkCanvas_GeometrySketch); } catch { }
             SaveNecessity = true;
         }
         private void AppBarButton_Redo_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.UndoRedoBase.Redo(InkCanvas_GeometrySketch);
+            try { ViewModel.UndoRedoBase.Redo(InkCanvas_GeometrySketch); } catch { }
+            SaveNecessity = true;
+        }
+        private void AppBarButton_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteAllOperation dao = new DeleteAllOperation(InkCanvas_GeometrySketch.InkPresenter.StrokeContainer.GetStrokes());
+            ViewModel.UndoRedoBase.AddOperationToUndoneOperations(dao);
+
+            InkCanvas_GeometrySketch.InkPresenter.StrokeContainer.Clear();
+
             SaveNecessity = true;
         }
 
+
+
+        //SaveNecessity
         private void InkPresenter_StrokesCollected(InkPresenter sender, InkStrokesCollectedEventArgs args)
         {
             AddStrokeOperation addStrokeOperation = new AddStrokeOperation(args.Strokes.Last());
@@ -781,65 +702,71 @@ namespace GeometrySketch
             SaveNecessity = true;
         }
 
+
+
         //Print and Export
         PrintHelper printHelper { get; set; }
         private async void AppBarButton_Print_Click(object sender, RoutedEventArgs e)
         {
-            var defaultPrintHelperOptions = new PrintHelperOptions()
+            try
             {
-                Orientation = PrintOrientation.Portrait
-            };            
-            defaultPrintHelperOptions.AddDisplayOption(StandardPrintTaskOptions.Orientation);
-                        
-            printHelper = new PrintHelper(Container, defaultPrintHelperOptions);            
-            
-            var grid = new Grid()
-            {
-                Height = Grid_InkCanvas.Height,
-                Width = Grid_InkCanvas.Width,
-                Margin = Grid_InkCanvas.Margin,
-                BorderThickness = Grid_InkCanvas.BorderThickness,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            };            
+                var defaultPrintHelperOptions = new PrintHelperOptions()
+                {
+                    Orientation = PrintOrientation.Portrait
+                };
+                defaultPrintHelperOptions.AddDisplayOption(StandardPrintTaskOptions.Orientation);
 
-            var rtb = new RenderTargetBitmap();
-            await rtb.RenderAsync(Grid_InkCanvas);
-            
-            IBuffer pixelBuffer = await rtb.GetPixelsAsync();
-            byte[] pixels = pixelBuffer.ToArray();
-            
-            DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+                printHelper = new PrintHelper(Container, defaultPrintHelperOptions);
 
-            var stream = new InMemoryRandomAccessStream();
-            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-            encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
+                var grid = new Grid()
+                {
+                    Height = Grid_InkCanvas.Height,
+                    Width = Grid_InkCanvas.Width,
+                    Margin = Grid_InkCanvas.Margin,
+                    BorderThickness = Grid_InkCanvas.BorderThickness,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
 
-            await encoder.FlushAsync(); stream.Seek(0);
-                  
-            BitmapImage bimg = new BitmapImage();
-            await bimg.SetSourceAsync(stream);            
-            
-            Image img = new Image()
-            {
-                Width = Grid_InkCanvas.Width,
-                Height = Grid_InkCanvas.Height,
-                Source = bimg
-            };
+                var rtb = new RenderTargetBitmap();
+                await rtb.RenderAsync(Grid_InkCanvas);
 
-            Viewbox vb = new Viewbox()
-            {
-                Child = grid               
-            }; 
+                IBuffer pixelBuffer = await rtb.GetPixelsAsync();
+                byte[] pixels = pixelBuffer.ToArray();
 
-            grid.Children.Add(img);
+                DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
 
-            printHelper.AddFrameworkElementToPrint(vb);
-            
-            printHelper.OnPrintFailed += PrintHelper_OnPrintFailed;
-            printHelper.OnPrintSucceeded += PrintHelper_OnPrintSucceeded;
-                       
-            await printHelper.ShowPrintUIAsync("GeometrySketch");
+                var stream = new InMemoryRandomAccessStream();
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
+
+                await encoder.FlushAsync(); stream.Seek(0);
+
+                BitmapImage bimg = new BitmapImage();
+                await bimg.SetSourceAsync(stream);
+
+                Image img = new Image()
+                {
+                    Width = Grid_InkCanvas.Width,
+                    Height = Grid_InkCanvas.Height,
+                    Source = bimg
+                };
+
+                Viewbox vb = new Viewbox()
+                {
+                    Child = grid
+                };
+
+                grid.Children.Add(img);
+
+                printHelper.AddFrameworkElementToPrint(vb);
+
+                printHelper.OnPrintFailed += PrintHelper_OnPrintFailed;
+                printHelper.OnPrintSucceeded += PrintHelper_OnPrintSucceeded;
+
+                await printHelper.ShowPrintUIAsync("GeometrySketch");
+            }
+            catch { }
         }
         private async void PrintHelper_OnPrintSucceeded()
         {
@@ -855,156 +782,167 @@ namespace GeometrySketch
         }
         private async void AppBarButton_Exportjpeg_Click(object sender, RoutedEventArgs e)
         {
-            FileSavePicker savePicker = new FileSavePicker()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop,                
-                DefaultFileExtension = ".jpeg",
-                SuggestedFileName = "Skizze"
-            };
-            savePicker.FileTypeChoices.Add("jpeg", new List<string>() { ".jpeg" });
-
-            StorageFile file = await savePicker.PickSaveFileAsync();
-
-            if (file != null)
-            {
-                ViewModel.ProgressRingActive = true;
-                CachedFileManager.DeferUpdates(file);
-                
-                var grid = new Grid()
+                FileSavePicker savePicker = new FileSavePicker()
                 {
-                    Height = Grid_InkCanvas.Height,
-                    Width = Grid_InkCanvas.Width,
-                    Margin = Grid_InkCanvas.Margin,
-                    BorderThickness = Grid_InkCanvas.BorderThickness,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    DefaultFileExtension = ".jpeg",
+                    SuggestedFileName = "Skizze"
                 };
+                savePicker.FileTypeChoices.Add("jpeg", new List<string>() { ".jpeg" });
 
-                var rtb = new RenderTargetBitmap();
-                await rtb.RenderAsync(Grid_InkCanvas);
-                
-                IBuffer pixelBuffer = await rtb.GetPixelsAsync();
-                byte[] pixels = pixelBuffer.ToArray();
-                
-                DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+                StorageFile file = await savePicker.PickSaveFileAsync();
 
-                IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);                              
-                
-                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
-
-                await encoder.FlushAsync();
-                stream.Seek(0);
-
-                Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
-
-                if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
+                if (file != null)
                 {
-                    // File saved.
+                    ViewModel.ProgressRingActive = true;
+                    CachedFileManager.DeferUpdates(file);
+
+                    var grid = new Grid()
+                    {
+                        Height = Grid_InkCanvas.Height,
+                        Width = Grid_InkCanvas.Width,
+                        Margin = Grid_InkCanvas.Margin,
+                        BorderThickness = Grid_InkCanvas.BorderThickness,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    };
+
+                    var rtb = new RenderTargetBitmap();
+                    await rtb.RenderAsync(Grid_InkCanvas);
+
+                    IBuffer pixelBuffer = await rtb.GetPixelsAsync();
+                    byte[] pixels = pixelBuffer.ToArray();
+
+                    DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+
+                    IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+
+                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
+
+                    await encoder.FlushAsync();
+                    stream.Seek(0);
+
+                    Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
+
+                    if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
+                    {
+                        // File saved.
+                    }
+                    else
+                    {
+                        // File couldn't be saved.
+                    }
                 }
                 else
                 {
-                    // File couldn't be saved.
+                    // Operation cancelled.
                 }
+                ViewModel.ProgressRingActive = false;
             }
-            else
+            catch
             {
-                // Operation cancelled.
+
             }
-            ViewModel.ProgressRingActive = false;
         }
         private async void AppBarButton_Exportbmp_Click(object sender, RoutedEventArgs e)
         {
-            FileSavePicker savePicker = new FileSavePicker()
+            try
             {
-                SuggestedStartLocation = PickerLocationId.Desktop,
-                DefaultFileExtension = ".bmp",
-                SuggestedFileName = "Skizze"
-            };
-            savePicker.FileTypeChoices.Add("bmp", new List<string>() { ".bmp" });
-
-            StorageFile file = await savePicker.PickSaveFileAsync();
-
-            if (file != null)
-            {
-                ViewModel.ProgressRingActive = true;
-                CachedFileManager.DeferUpdates(file);
-
-                var grid = new Grid()
+                FileSavePicker savePicker = new FileSavePicker()
                 {
-                    Height = Grid_InkCanvas.Height,
-                    Width = Grid_InkCanvas.Width,
-                    Margin = Grid_InkCanvas.Margin,
-                    BorderThickness = Grid_InkCanvas.BorderThickness,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    DefaultFileExtension = ".bmp",
+                    SuggestedFileName = "Skizze"
                 };
+                savePicker.FileTypeChoices.Add("bmp", new List<string>() { ".bmp" });
 
+                StorageFile file = await savePicker.PickSaveFileAsync();
+
+                if (file != null)
+                {
+                    ViewModel.ProgressRingActive = true;
+                    CachedFileManager.DeferUpdates(file);
+
+                    var grid = new Grid()
+                    {
+                        Height = Grid_InkCanvas.Height,
+                        Width = Grid_InkCanvas.Width,
+                        Margin = Grid_InkCanvas.Margin,
+                        BorderThickness = Grid_InkCanvas.BorderThickness,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    };
+
+                    var rtb = new RenderTargetBitmap();
+                    await rtb.RenderAsync(Grid_InkCanvas);
+
+                    IBuffer pixelBuffer = await rtb.GetPixelsAsync();
+                    byte[] pixels = pixelBuffer.ToArray();
+
+                    DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+
+                    IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+
+                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.BmpEncoderId, stream);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
+
+                    await encoder.FlushAsync();
+                    stream.Seek(0);
+
+                    Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
+
+                    if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
+                    {
+                        // File saved.
+                    }
+                    else
+                    {
+                        // File couldn't be saved.
+                    }
+                }
+                else
+                {
+                    // Operation cancelled.
+                }
+                ViewModel.ProgressRingActive = false;
+            }
+            catch
+            {
+
+            }
+        }
+        private async void AppBarButton_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
                 var rtb = new RenderTargetBitmap();
                 await rtb.RenderAsync(Grid_InkCanvas);
-                
+
                 IBuffer pixelBuffer = await rtb.GetPixelsAsync();
                 byte[] pixels = pixelBuffer.ToArray();
-                
+
                 DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
 
-                IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
-
-                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.BmpEncoderId, stream);
+                var stream = new InMemoryRandomAccessStream();
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
 
                 await encoder.FlushAsync();
                 stream.Seek(0);
 
-                Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
+                DataPackage dataPackage = new DataPackage();
+                dataPackage.RequestedOperation = DataPackageOperation.Copy;
+                dataPackage.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
 
-                if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
-                {
-                    // File saved.
-                }
-                else
-                {
-                    // File couldn't be saved.
-                }
+                Clipboard.SetContent(dataPackage);
             }
-            else
+            catch
             {
-                // Operation cancelled.
+
             }
-            ViewModel.ProgressRingActive = false;
-        }
-        private async void AppBarButton_Copy_Click(object sender, RoutedEventArgs e)
-        {
-            var grid = new Grid()
-            {
-                Height = Grid_InkCanvas.Height,
-                Width = Grid_InkCanvas.Width,
-                Margin = Grid_InkCanvas.Margin,
-                BorderThickness = Grid_InkCanvas.BorderThickness,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            };
-
-            var rtb = new RenderTargetBitmap();
-            await rtb.RenderAsync(Grid_InkCanvas); 
-            
-            IBuffer pixelBuffer = await rtb.GetPixelsAsync();
-            byte[] pixels = pixelBuffer.ToArray();
-            
-            DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
-
-            var stream = new InMemoryRandomAccessStream();
-            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-            encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)rtb.PixelWidth, (uint)rtb.PixelHeight, displayInformation.RawDpiX, displayInformation.RawDpiY, pixels);
-
-            await encoder.FlushAsync();
-            stream.Seek(0);
-
-            DataPackage dataPackage = new DataPackage();
-            dataPackage.RequestedOperation = DataPackageOperation.Copy;
-            dataPackage.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
-
-            Clipboard.SetContent(dataPackage);
         }
         private async void AppBarButton_New_Click(object sender, RoutedEventArgs e)
         {
@@ -1036,12 +974,14 @@ namespace GeometrySketch
             }
         }
 
+
+
         //Settings Dialog
         SettingsDialog settingsDialog { get; set; }
         private async void AppBarButton_Settings_Click(object sender, RoutedEventArgs e)
         {
             settingsDialog = new Views.SettingsDialog(ViewModel);
             await settingsDialog.ShowAsync();
-        }
+        }       
     }
 }

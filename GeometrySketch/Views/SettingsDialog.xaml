@@ -14,7 +14,7 @@
             <RadioButton x:Name="RadioButton_Light" Margin="10,10,0,0" VerticalAlignment="Center" IsChecked="{x:Bind ViewModel.ThemeLight, Mode=TwoWay}" Content="Hell" GroupName="Theme"/>
             <RadioButton x:Name="RadioButton_Dark" Margin="10,0,0,0" Content="Dunkel" IsChecked="{x:Bind ViewModel.ThemeDark, Mode=TwoWay}" GroupName="Theme"/>
             <RadioButton x:Name="RadioButton_System" Margin="10,0,0,0" Content="Verwende Systemeinstellungen" IsChecked="{x:Bind ViewModel.ThemeSystem,Mode=TwoWay}" GroupName="Theme"/>
-            <TextBlock Text="Drittanbieter-Software" Margin="0,30,0,0" FontSize="16"/>
+            <TextBlock Text="Drittanbieter-Software und Bibliotheken" Margin="0,30,0,0" FontSize="16"/>
             <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
                 <TextBlock Text="Newtonsoft Json v12.0.3 von James Newton King:" VerticalAlignment="Center"/>
                 <HyperlinkButton Content="EULA" NavigateUri="https://licenses.nuget.org/MIT" Margin="30,0,0,0" />
@@ -34,7 +34,7 @@
             </StackPanel>
             <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
             <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
-                <TextBlock Text="Version 1.1.0 entwickelt von" VerticalAlignment="Center"/>
+                <TextBlock Text="Version 1.2.0 entwickelt von" VerticalAlignment="Center"/>
                 <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
             </StackPanel>
             <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/GeometrySketch" Margin="10,0,0,0"/>

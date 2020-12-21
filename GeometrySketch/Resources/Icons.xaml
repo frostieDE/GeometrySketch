@@ -15,7 +15,10 @@
             </x:String>
             <x:String x:Key="Icon_Lineal">
                 /Assets/Icons/Icon_Lineal_Dark.png
-            </x:String>            
+            </x:String>
+            <x:String x:Key="Icon_Laserpointer">
+                /Assets/Icons/Icon_Laserpointer_Dark.png
+            </x:String>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <x:String x:Key="Icon_Grid">
@@ -29,7 +32,10 @@
             </x:String>
             <x:String x:Key="Icon_Lineal">
                 /Assets/Icons/Icon_Lineal_Light.png
-            </x:String>            
+            </x:String>
+            <x:String x:Key="Icon_Laserpointer">
+                /Assets/Icons/Icon_Laserpointer_Light.png
+            </x:String>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

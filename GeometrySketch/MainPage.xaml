@@ -13,7 +13,8 @@
 
     <Page.Resources>        
         <Converter:SolidColorBrushToColor_Converter x:Key="SolidColorBrushToColor_Converter"/>        
-        <Converter:BoolToVisibility_Converter x:Key="BoolToVisibility_Converter"/>                
+        <Converter:BoolToVisibility_Converter x:Key="BoolToVisibility_Converter"/>
+        <Converter:VisibilityToBool_Converter x:Key="VisibilityToBool_Converter"/>
         <Converter:RadiusToLE_Converter x:Key="RadiusToLE_Converter"/>
         <Converter:EraserWidthToRectangle_Converter x:Key="EraserWidthToRectangle_Converter"/>        
     </Page.Resources>
@@ -34,13 +35,16 @@
             <CommandBar x:Name="CommandBar_Left" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsOpen="False" DefaultLabelPosition="Collapsed" Background="Transparent" Height="40" VerticalAlignment="Top">
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal">
-                        <InkToolbar x:Name="InkToolbar" ActiveToolChanged="InkToolbar_ActiveToolChanged" TargetInkCanvas="{x:Bind InkCanvas_GeometrySketch}" InitialControls="None" HorizontalAlignment="Center" VerticalAlignment="Top">
-                            <InkToolbarBallpointPenButton x:Name="BallPointPen_Button" Palette="{x:Bind ViewModel.Colors_BallpointPen, Mode=TwoWay}" MinStrokeWidth="1" MaxStrokeWidth="10" GroupName="Pens"/>
-                            <InkToolbarPencilButton x:Name="Pencil_Button" Palette="{x:Bind ViewModel.Colors_Pencil, Mode=TwoWay}" GroupName="Pens"/>
-                            <InkToolbarHighlighterButton x:Name="Highlighter_Button" Palette="{x:Bind ViewModel.Colors_Highlighter, Mode=TwoWay}" GroupName="Pens"/>
-                            <InkToolbarCustomPenButton x:Name="Eraser_Button" ToolTipService.ToolTip="Radierer" GroupName="Pens">
+                        <InkToolbar x:Name="InkToolbar" ActiveToolChanged="InkToolbar_ActiveToolChanged" TargetInkCanvas="{x:Bind InkCanvas_GeometrySketch}" InitialControls="None">
+                            <InkToolbarBallpointPenButton x:Name="BallPointPen_Button" Palette="{x:Bind ViewModel.Colors_BallpointPen, Mode=TwoWay}" MinStrokeWidth="1" MaxStrokeWidth="10" GroupName="InkingTools"/>
+                            <InkToolbarPencilButton x:Name="Pencil_Button" Palette="{x:Bind ViewModel.Colors_Pencil, Mode=TwoWay}" GroupName="InkingTools"/>
+                            <InkToolbarHighlighterButton x:Name="Highlighter_Button" Palette="{x:Bind ViewModel.Colors_Highlighter, Mode=TwoWay}" GroupName="InkingTools"/>
+                            <InkToolbarCustomToolButton x:Name="Laserpointer_Button" ToolTipService.ToolTip="Laserpointer" GroupName="InkingTools" Unchecked="{x:Bind ViewModel.DeactivateLaserpointer,Mode=OneWay}">
+                                <Image Source="{ThemeResource Icon_Laserpointer}" Height="26"/>
+                            </InkToolbarCustomToolButton>
+                            <InkToolbarCustomToolButton x:Name="Eraser_Button" ToolTipService.ToolTip="Radierer" GroupName="Pens" Unchecked="{x:Bind ViewModel.DeactivateEraser,Mode=OneWay}">
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE75C;"/>
-                                <InkToolbarCustomPenButton.ConfigurationContent>                                    
+                                <InkToolbarCustomToolButton.ConfigurationContent>                                    
                                         <StackPanel>
                                             <TextBlock Text="Radierer auswählen" Height="30" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
                                             <ListView SelectionMode="Single" SelectedIndex="{x:Bind ViewModel.SelectedEraser, Mode=TwoWay}" SelectionChanged="ListViewEraser_SelectionChanged">
@@ -86,25 +90,24 @@
                                                 </ListViewItem>
                                             </ListView>       
                                     </StackPanel>                                    
-                                </InkToolbarCustomPenButton.ConfigurationContent>
-                            </InkToolbarCustomPenButton>
+                                </InkToolbarCustomToolButton.ConfigurationContent>
+                            </InkToolbarCustomToolButton>
                         </InkToolbar>                        
                     </StackPanel>
                 </CommandBar.Content>
-                <AppBarButton x:Name="AppBarButton_Delete" Width="Auto" MinWidth="40" ToolTipService.ToolTip="Alles löschen" Label="Seite leeren" Icon="Delete" Click="AppBarButton_Delete_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
-                <AppBarSeparator/>
+                <AppBarSeparator/>                
                 <AppBarElementContainer>
-                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Lineal" ToolTipService.ToolTip="Lineal" IsChecked="{x:Bind Lineal.IsVisible, Mode=TwoWay}" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Lineal" ToolTipService.ToolTip="Lineal" IsChecked="{x:Bind Lineal.IsVisible, Mode=TwoWay}" Checked="ConstructionTools_Checked" Unchecked="ConstructionTools_Unchecked">
                         <Image Source="{ThemeResource Icon_Lineal}" Height="26"/>
                     </InkToolbarCustomToggleButton>                    
                 </AppBarElementContainer>                
                 <AppBarElementContainer>
-                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Geodreieck" ToolTipService.ToolTip="Geodreieck" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Geodreieck" ToolTipService.ToolTip="Geodreieck" IsChecked="{x:Bind ViewModel.GeodreieckVisibilty, Mode=TwoWay, Converter={StaticResource VisibilityToBool_Converter}}" Checked="ConstructionTools_Checked" Unchecked="ConstructionTools_Unchecked">
                         <Image Source="{ThemeResource Icon_Geodreieck}" Height="26"/>
                     </InkToolbarCustomToggleButton>
                 </AppBarElementContainer>
                 <AppBarElementContainer>
-                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Zirkel" ToolTipService.ToolTip="Zirkel" IsChecked="{x:Bind Zirkel.IsVisible, Mode=TwoWay}" Checked="DrawingTools_Checked" Unchecked="DrawingTools_Unchecked">
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Zirkel" ToolTipService.ToolTip="Zirkel" IsChecked="{x:Bind Zirkel.IsVisible, Mode=TwoWay}" Checked="ConstructionTools_Checked" Unchecked="ConstructionTools_Unchecked">
                         <Image Source="{ThemeResource Icon_Zirkel}" Height="26"/>
                     </InkToolbarCustomToggleButton>
                 </AppBarElementContainer>
@@ -124,6 +127,7 @@
                         <KeyboardAccelerator Modifiers="Control" Key="Z"/>
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
+                <AppBarButton x:Name="AppBarButton_Delete" Width="Auto" MinWidth="40" ToolTipService.ToolTip="Alles löschen" Label="Seite leeren" Icon="Delete" Click="AppBarButton_Delete_Click" Style="{ThemeResource AppBarButtonRevealStyle}"/>
                 <AppBarSeparator/>
                 <AppBarButton MinWidth="40" Label="Exportieren" ToolTipService.ToolTip="Seite exportieren" Width="Auto" Style="{ThemeResource AppBarButtonRevealStyle}">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEDE1;"/>
@@ -166,7 +170,7 @@
             </CommandBar> 
         </Grid>
         <Grid x:Name="Grid_ScrollViewer" Grid.Row="1" Background="{ThemeResource Canvas_Background}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <ScrollViewer x:Name="ScrollViewer_InkCanvas" MinZoomFactor="0.1" MaxZoomFactor="2" ZoomMode="Enabled" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible" >
+            <ScrollViewer x:Name="ScrollViewer_InkCanvas" CanContentRenderOutsideBounds="False" MinZoomFactor="0.1" MaxZoomFactor="2" ZoomMode="Enabled" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible">
                 <Grid x:Name="Grid_InkContainer" Width="2121" Height="3021">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="10"/>
@@ -181,7 +185,7 @@
                     <Grid x:Name="Grid_InkCanvas" Grid.Column="1" Grid.Row="1" Background="White">                        
                         <Grid x:Name="Container" Opacity="0"/>
                         <ComTools:AlignmentGrid x:Name="AlignmentGrid_InkCanvas" Visibility="{x:Bind ViewModel.AlignmentGridVisibilty, Mode=OneWay}" Background="White" Opacity="1" LineBrush="Black" HorizontalStep="50" VerticalStep="50"/>
-                        <InkCanvas x:Name="InkCanvas_GeometrySketch" ManipulationMode="All" PointerWheelChanged="InkCanvas_PointerWheelChanged" ManipulationDelta="InkCanvas_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted"/>
+                        <InkCanvas x:Name="InkCanvas_GeometrySketch" ManipulationMode="All" ManipulationDelta="InkCanvas_ManipulationDelta" ManipulationStarted="Geodreieck_ManipulationStarted" ManipulationCompleted="Geodreieck_ManipulationCompleted"/>
                         <Canvas x:Name="Canvas_Eraser" IsHitTestVisible="False" Visibility="Visible" Background="Transparent" Width="{x:Bind InkCanvas_GeometrySketch.Width,Mode=OneWay}" Height="{x:Bind InkCanvas_GeometrySketch.Height, Mode=OneWay}">
                             <Rectangle x:Name="Rectangle_Eraser" Visibility="Collapsed" Fill="WhiteSmoke" Stroke="DarkGray" Width="{x:Bind ViewModel.EraserWidth, Mode=OneWay,Converter={StaticResource EraserWidthToRectangle_Converter}}" Height="{x:Bind ViewModel.EraserWidth, Mode=OneWay,Converter={StaticResource EraserWidthToRectangle_Converter}}" StrokeThickness="1" StrokeDashArray="4, 2" StrokeEndLineCap="Flat" StrokeDashOffset="2" StrokeDashCap="Round">
                                 <Rectangle.RenderTransform>
@@ -189,6 +193,14 @@
                                 </Rectangle.RenderTransform>
                             </Rectangle>
                         </Canvas>
+                        <Canvas x:Name="Canvas_Laserpointer" IsHitTestVisible="False" Visibility="Visible" Background="Transparent" Width="{x:Bind InkCanvas_GeometrySketch.Width,Mode=OneWay}" Height="{x:Bind InkCanvas_GeometrySketch.Height, Mode=OneWay}">
+                            <Ellipse x:Name="Ellipse_Laserpointer" Visibility="Collapsed" Fill="Red" Stroke="MediumVioletRed" Opacity="0.5" StrokeThickness="4" Height="25" Width="25">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform x:Name="TranslateTransform_Ellipse_Laserpointer" X="0" Y="0"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Canvas>
+                        <Canvas x:Name="Canvas_Koordinatensystem" IsHitTestVisible="False" Visibility="Visible" Background="Transparent" Width="{x:Bind InkCanvas_GeometrySketch.Width,Mode=OneWay}" Height="{x:Bind InkCanvas_GeometrySketch.Height, Mode=OneWay}"/>
                         <Polygon x:Name="Polygon_GeodreieckBackground" Points="0 799 1600 799 800 0" Visibility="{x:Bind Geodreieck.Visibility, Mode=OneWay}" Fill="#ECECEC" Opacity="0.75" IsHitTestVisible="False">
                             <Polygon.RenderTransform>
                                 <TransformGroup>
@@ -217,7 +229,7 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <ComToolsControls:Expander x:Name="Expander_DrawingToolsDetails" Background="{ThemeResource SystemControlAcrylicWindowBrush}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ExpandDirection="Up"  Grid.Row="2" VerticalAlignment="Bottom" IsExpanded="true" Header="Schnelleinstellungen der Zeichenwerkzeuge" HeaderStyle="{StaticResource ToggleButton_ExpanderHeader_Style}">
+        <ComToolsControls:Expander x:Name="Expander_ConstructionToolsDetails" Background="{ThemeResource SystemControlAcrylicWindowBrush}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ExpandDirection="Up"  Grid.Row="2" VerticalAlignment="Bottom" IsExpanded="true" Header="Schnelleinstellungen der Zeichenwerkzeuge" HeaderStyle="{StaticResource ToggleButton_ExpanderHeader_Style}">
             <Grid x:Name="Grid_ToolDetails" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlAcrylicWindowBrush}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="360"/>                    
@@ -250,12 +262,12 @@
                         </GridView.ItemTemplate>
                     </GridView>                    
                 </Grid>
-                <Grid x:Name="DrawingToolsDetails" Grid.Column="1" Visibility="Visible">
+                <Grid x:Name="ConstructionToolsDetails" Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="{x:Bind ViewModel.SelectedDrawingTool, Mode=OneWay}" Grid.Column="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.SelectedConstructionTool, Mode=OneWay}" Grid.Column="2" VerticalAlignment="Center"/>
                     <Grid x:Name="Grid_GeodreieckDetail" Grid.Row="1" Visibility="{x:Bind ITBCTB_Geodreieck.IsChecked, Converter={StaticResource BoolToVisibility_Converter}, Mode=OneWay}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal">

@@ -136,6 +136,7 @@
     <Compile Include="Converter\EraserWidthToRectangle_Converter.cs" />
     <Compile Include="Converter\RadiusToLE_Converter.cs" />
     <Compile Include="Converter\SolidColorBrushToColor_Converter.cs" />
+    <Compile Include="Converter\VisibilityToBool_Converter.cs" />
     <Compile Include="DataProvider\IInkPageDataprovider.cs" />
     <Compile Include="DataProvider\InkPageDataprovider.cs" />
     <Compile Include="DataProvider\ISettingsDataProvider.cs" />
@@ -157,6 +158,9 @@
     <Compile Include="Views\SaveDialog.xaml.cs">
       <DependentUpon>SaveDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AddKoordinatensystemDialog.xaml.cs">
+      <DependentUpon>AddKoordinatensystemDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
     </Compile>
@@ -171,6 +175,8 @@
     <Content Include="Assets\Icons\Icon_Geodreieck_Light.png" />
     <Content Include="Assets\Icons\Icon_Grid_Dark.png" />
     <Content Include="Assets\Icons\Icon_Grid_Light.png" />
+    <Content Include="Assets\Icons\Icon_Laserpointer_Dark.png" />
+    <Content Include="Assets\Icons\Icon_Laserpointer_Light.png" />
     <Content Include="Assets\Icons\Icon_Lineal_Dark.png" />
     <Content Include="Assets\Icons\Icon_Lineal_Light.png" />
     <Content Include="Assets\Icons\Icon_Zirkel_Dark.png" />
@@ -255,6 +261,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\AddKoordinatensystemDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\SettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -275,6 +285,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Win2D.uwp">
+      <Version>1.25.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
