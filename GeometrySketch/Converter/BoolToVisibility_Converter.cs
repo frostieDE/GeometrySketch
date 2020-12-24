@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Data;
 
 namespace GeometrySketch.Converter
 {
-    public class BoolToVisibility_Converter: IValueConverter
+    public class BoolToVisibility_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

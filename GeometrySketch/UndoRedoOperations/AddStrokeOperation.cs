@@ -5,11 +5,11 @@ using Windows.UI.Xaml.Controls;
 namespace GeometrySketch.UndoRedoOperations
 {
     public class AddStrokeOperation : IUndoRedoOperation
-    { 
-        public InkStroke AddedStroke { get;}
+    {
+        public InkStroke AddedStroke { get; }
 
         public AddStrokeOperation(InkStroke inkStroke)
-        {        
+        {
             var strokeBuilder = new InkStrokeBuilder();
             strokeBuilder.SetDefaultDrawingAttributes(inkStroke.DrawingAttributes);
             System.Numerics.Matrix3x2 matr = inkStroke.PointTransform;
@@ -35,6 +35,6 @@ namespace GeometrySketch.UndoRedoOperations
             inkCanvas.InkPresenter.StrokeContainer.AddStroke(AddedStroke);
         }
 
-        public UndoRedoOperation GetUndoRedoOperation() => UndoRedoOperation.AddStroke;        
+        public UndoRedoOperation GetUndoRedoOperation() => UndoRedoOperation.AddStroke;
     }
 }

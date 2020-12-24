@@ -1,33 +1,33 @@
-﻿using System;
+﻿using GeometrySketch.Commons;
+using GeometrySketch.DataProvider;
+using GeometrySketch.UndoRedoOperations;
+using GeometrySketch.ViewModels;
+using GeometrySketch.Views;
+using Microsoft.Toolkit.Uwp.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Devices.Input;
+using Windows.Foundation;
+using Windows.Graphics.Display;
+using Windows.Graphics.Imaging;
+using Windows.Graphics.Printing;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.System;
+using Windows.System.Threading;
+using Windows.UI.Core;
+using Windows.UI.Core.Preview;
 using Windows.UI.Input.Inking;
 using Windows.UI.Input.Inking.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using GeometrySketch.ViewModels;
-using GeometrySketch.DataProvider;
-using Windows.UI.Core.Preview;
-using Windows.UI.Core;
-using GeometrySketch.Commons;
-using Windows.Storage;
-using Windows.Graphics.Printing;
-using Microsoft.Toolkit.Uwp.Helpers;
-using Windows.UI.Popups;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.Storage.Streams;
-using Windows.Graphics.Display;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Pickers;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.System;
-using Windows.System.Threading;
-using Windows.Foundation;
-using GeometrySketch.UndoRedoOperations;
-using GeometrySketch.Views;
-using Windows.Devices.Input;
 
 namespace GeometrySketch
 {
@@ -40,19 +40,19 @@ namespace GeometrySketch
         private CoreDispatcher CurrentThread { get; }
 
         public bool SaveNecessity { get; set; } = false;
-        
+
         public float ScaleFactor { get; set; } = 1;
 
         public ContentDialog CD_SaveQuery { get; set; }
 
         public InkPresenterRuler Lineal { get; }
-        public InkPresenterProtractor Zirkel { get; }             
-        
+        public InkPresenterProtractor Zirkel { get; }
+
         public MainPage()
         {
             ViewModel = new MainViewModel(new InkPageDataprovider(), new SettingsDataProvider(), InkCanvas_GeometrySketch, Rectangle_Eraser);
             this.InitializeComponent();
-            CurrentThread = CoreWindow.GetForCurrentThread().Dispatcher;            
+            CurrentThread = CoreWindow.GetForCurrentThread().Dispatcher;
 
             this.Loaded += MainPage_Loaded;
             App.Current.Suspending += Current_Suspending;
@@ -79,17 +79,17 @@ namespace GeometrySketch
             {
                 IsVisible = false,
                 IsAngleReadoutVisible = false,
-            }; 
+            };
 
-            coreInkIndependentInputSource = CoreInkIndependentInputSource.Create(InkCanvas_GeometrySketch.InkPresenter);            
-            coreWetStrokeUpdateSource = CoreWetStrokeUpdateSource.Create(InkCanvas_GeometrySketch.InkPresenter);            
+            coreInkIndependentInputSource = CoreInkIndependentInputSource.Create(InkCanvas_GeometrySketch.InkPresenter);
+            coreWetStrokeUpdateSource = CoreWetStrokeUpdateSource.Create(InkCanvas_GeometrySketch.InkPresenter);
             InkCanvas_GeometrySketch.InkPresenter.InputDeviceTypes = CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Mouse;
             InkCanvas_GeometrySketch.InkPresenter.StrokesErased += InkPresenter_StrokesErased;
             InkCanvas_GeometrySketch.InkPresenter.StrokesCollected += InkPresenter_StrokesCollected;
 
             InkCanvas_GeometrySketch.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
             InkCanvas_GeometrySketch.InkPresenter.UnprocessedInput.PointerEntered += UnprocessedInput_PointerEntered;
-        }               
+        }
 
 
 
@@ -146,7 +146,7 @@ namespace GeometrySketch
             }
         }
         private async void AppBarButton_Save_Click(object sender, RoutedEventArgs e)
-        {            
+        {
             await ViewModel.FileSaveAsync(InkCanvas_GeometrySketch);
             SaveNecessity = false;
         }
@@ -173,30 +173,30 @@ namespace GeometrySketch
             else
             {
                 await ViewModel.FileOpenAsync(InkCanvas_GeometrySketch);
-            }            
+            }
             SaveNecessity = false;
         }
-        
+
 
 
         //InkinkToolsChanged        
         private void InkToolbar_ActiveToolChanged(InkToolbar sender, object args)
-        {            
+        {
             if (BallPointPen_Button.IsChecked == true)
             {
                 ViewModel.SelectedInkingToolIndex = 0;
-                ViewModel.SelectedPen = BallPointPen_Button;                
+                ViewModel.SelectedPen = BallPointPen_Button;
             }
             else if (Pencil_Button.IsChecked == true)
             {
                 ViewModel.SelectedInkingToolIndex = 1;
-                ViewModel.SelectedPen = Pencil_Button;                
+                ViewModel.SelectedPen = Pencil_Button;
             }
             else if (Highlighter_Button.IsChecked == true)
             {
                 ViewModel.SelectedInkingToolIndex = 2;
-                ViewModel.SelectedPen = Highlighter_Button;                
-            }            
+                ViewModel.SelectedPen = Highlighter_Button;
+            }
             else if (Laserpointer_Button.IsChecked == true)
             {
                 ViewModel.SelectedInkingToolIndex = 3;
@@ -211,7 +211,7 @@ namespace GeometrySketch
             if (IsInkingToolAutoChanged != true)
             {
                 LastInkingTool = ViewModel.SelectedInkingToolIndex;
-            }                    
+            }
 
             GridView_Colors.DataContext = null;
             ViewModel.PenAttributesChanged(PreviewInkStrokeCanvas);
@@ -240,7 +240,7 @@ namespace GeometrySketch
                     break;
                 case 2:
                     Highlighter_Button.IsChecked = true;
-                    break;                
+                    break;
                 case 3:
                     Laserpointer_Button.IsChecked = true;
                     break;
@@ -255,18 +255,18 @@ namespace GeometrySketch
         }
         private bool IsInkingToolAutoChanged { get; set; } = false;
         private void UnprocessedInput_PointerEntered(InkUnprocessedInput sender, PointerEventArgs args)
-        {            
+        {
             if (args.CurrentPoint.Properties.IsInverted == true && args.CurrentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Pen)
             {
                 IsInkingToolAutoChanged = true;
-                Eraser_Button.IsChecked = true;                
+                Eraser_Button.IsChecked = true;
             }
-            else if(args.CurrentPoint.Properties.IsInverted == false && args.CurrentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Pen)
+            else if (args.CurrentPoint.Properties.IsInverted == false && args.CurrentPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Pen)
             {
                 IsInkingToolAutoChanged = true;
-                SelectLastInkingTool();                
-            }            
-        }        
+                SelectLastInkingTool();
+            }
+        }
 
 
 
@@ -332,8 +332,8 @@ namespace GeometrySketch
                 catch
                 {
 
-                }            
-            }            
+                }
+            }
         }
         private void ConstructionTools_Unchecked(object sender, RoutedEventArgs e)
         {
@@ -476,7 +476,7 @@ namespace GeometrySketch
             {
                 X = e.Position.X,
                 Y = e.Position.Y,
-            };            
+            };
 
             if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true)
             {
@@ -485,7 +485,7 @@ namespace GeometrySketch
         }
         private void Geodreieck_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            Polygon_GeodreieckBackground.Opacity = 0.75;            
+            Polygon_GeodreieckBackground.Opacity = 0.75;
         }
         private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
@@ -532,7 +532,7 @@ namespace GeometrySketch
             {
                 X = e.Position.X,
                 Y = e.Position.Y,
-            };           
+            };
 
             if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && ViewModel.GeodreieckVisibilty == Visibility.Visible)
             {
@@ -555,8 +555,8 @@ namespace GeometrySketch
                 }
                 ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
             }
-        }        
-        
+        }
+
         //Snap to Geodreieck
         private bool Snap { get; set; }
         private bool IsInkSpace { get; set; }
@@ -982,6 +982,6 @@ namespace GeometrySketch
         {
             settingsDialog = new Views.SettingsDialog(ViewModel);
             await settingsDialog.ShowAsync();
-        }       
+        }
     }
 }

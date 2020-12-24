@@ -1,6 +1,5 @@
 ﻿using GeometrySketch.Base;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Controls;
 
@@ -19,7 +18,7 @@ namespace GeometrySketch.UndoRedoOperations
             UndoneOperations.Add(undoRedoOperation);
             OnPropertyChanged(nameof(CanUndo));
         }
-        
+
         public void AddOperationToRedoneOperations(IUndoRedoOperation undoRedoOperation)
         {
             RedoneOperations.Add(undoRedoOperation);
@@ -41,7 +40,7 @@ namespace GeometrySketch.UndoRedoOperations
         public bool CanUndo { get { if (UndoneOperations.Count > 0) { return true; } else { return false; } } }
 
         public bool CanRedo { get { if (RedoneOperations.Count > 0) { return true; } else { return false; } } }
-        
+
         public void Undo(InkCanvas inkCanvas)
         {
             if (UndoneOperations.Count > 0)
@@ -76,10 +75,10 @@ namespace GeometrySketch.UndoRedoOperations
                 {
 
                 }
-                RemoveLastUndoneOperation();                
-            }            
+                RemoveLastUndoneOperation();
+            }
         }
-        
+
         public void Redo(InkCanvas inkCanvas)
         {
             if (RedoneOperations.Count > 0)
@@ -115,7 +114,7 @@ namespace GeometrySketch.UndoRedoOperations
 
                 }
                 RemoveLastRedoneOperation();
-            }            
+            }
         }
 
         public UndoRedoBase()

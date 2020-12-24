@@ -5,8 +5,8 @@ using Windows.UI.Xaml.Controls;
 namespace GeometrySketch.UndoRedoOperations
 {
     public class DeleteAllOperation : IUndoRedoOperation
-    {        
-        public List<InkStroke> DeletedStrokes { get; }        
+    {
+        public List<InkStroke> DeletedStrokes { get; }
 
         public DeleteAllOperation(IReadOnlyList<InkStroke> inkStrokes)
         {
@@ -27,14 +27,14 @@ namespace GeometrySketch.UndoRedoOperations
                 IReadOnlyList<InkPoint> inkPoints = isk.GetInkPoints();
 
                 inkCanvas.InkPresenter.StrokeContainer.AddStroke(strokeBuilder.CreateStrokeFromInkPoints(inkPoints, matr, isk.StrokeStartedTime, isk.StrokeDuration));
-            }            
+            }
         }
-        
+
         public void Redo(InkCanvas inkCanvas)
         {
             inkCanvas.InkPresenter.StrokeContainer.Clear();
         }
 
-        public UndoRedoOperation GetUndoRedoOperation() => UndoRedoOperation.DeleteAll;        
+        public UndoRedoOperation GetUndoRedoOperation() => UndoRedoOperation.DeleteAll;
     }
 }

@@ -7,16 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.UI.Core;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
-using Windows.Foundation;
-using Windows.UI.Core;
-using System.Threading;
 
 namespace GeometrySketch.ViewModels
 {
@@ -102,7 +101,7 @@ namespace GeometrySketch.ViewModels
         public MainViewModel(IInkPageDataprovider inkPageDataProvider, ISettingsDataProvider settingsDataProvider, InkCanvas inkCanvas, Rectangle rectangle)
         {
             _settingsDataProvider = settingsDataProvider;
-            _inkPageDataProvider = inkPageDataProvider;            
+            _inkPageDataProvider = inkPageDataProvider;
 
             //DefaultColors
             Colors_BallpointPen = new BrushCollection()
@@ -286,7 +285,7 @@ namespace GeometrySketch.ViewModels
         {
             CurrentInkCanvas = inkCanvas;
             Rectangle_Eraser = rectangle_Eraser;
-            TranslateTransform_Rectangle_Eraser = translateTransform;                        
+            TranslateTransform_Rectangle_Eraser = translateTransform;
 
             switch (SelectedEraser)
             {
@@ -324,7 +323,7 @@ namespace GeometrySketch.ViewModels
                     CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInputEraser_PointerMoved;
                     CurrentInkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInputEraser_PointerReleased;
                     break;
-            }           
+            }
         }
         public void DeactivateEraser(object sender, RoutedEventArgs e)
         {
@@ -449,7 +448,7 @@ namespace GeometrySketch.ViewModels
             ErasePoints(args);
             CurrentInkCanvas.InkPresenter.StrokeContainer.SelectWithLine(p2, p4);
             ErasePoints(args);
-        }            
+        }
         private void UnprocessedInputEraser_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
         {
             Rectangle_Eraser.Visibility = Visibility.Collapsed;
@@ -458,7 +457,7 @@ namespace GeometrySketch.ViewModels
             {
                 StrokesAfter.Add(isk);
             }
-                        
+
             UndoRedoBase.AddOperationToUndoneOperations(new EraseByPointOperation(StrokesBefore, StrokesAfter));
         }
 
@@ -467,8 +466,8 @@ namespace GeometrySketch.ViewModels
         {
             CurrentInkCanvas = inkCanvas;
             Ellipse_Laserpointer = ellipse_Laserpointer;
-            TranslateTransform_Ellipse_Laserpointer = translateTransform;            
-            
+            TranslateTransform_Ellipse_Laserpointer = translateTransform;
+
             CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.Mode = InkInputProcessingMode.None;
             CurrentInkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
 
@@ -492,17 +491,17 @@ namespace GeometrySketch.ViewModels
         private void UnprocessedInputLaserpointer_PointerMoved(InkUnprocessedInput sender, PointerEventArgs args)
         {
             TranslateTransform_Ellipse_Laserpointer.X = (float)args.CurrentPoint.RawPosition.X - 12.5;
-            TranslateTransform_Ellipse_Laserpointer.Y = (float)args.CurrentPoint.RawPosition.Y - 12.5;            
+            TranslateTransform_Ellipse_Laserpointer.Y = (float)args.CurrentPoint.RawPosition.Y - 12.5;
         }
         private void UnprocessedInputLaserpointer_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
         {
-            Ellipse_Laserpointer.Visibility = Visibility.Collapsed;            
+            Ellipse_Laserpointer.Visibility = Visibility.Collapsed;
         }
 
         //InkingToolsPropertiers      
         private InkToolbarPenButton _selectedPen;
-        public InkToolbarPenButton SelectedPen { get { return _selectedPen; } set { _selectedPen = value; OnPropertyChanged();  } }
-        
+        public InkToolbarPenButton SelectedPen { get { return _selectedPen; } set { _selectedPen = value; OnPropertyChanged(); } }
+
         private int selectedInkingToolIndex = 0;
         public int SelectedInkingToolIndex { get { return selectedInkingToolIndex; } set { selectedInkingToolIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(InkingToolsDetailsVisibility)); } }
 
@@ -540,8 +539,8 @@ namespace GeometrySketch.ViewModels
             da.Size = new Size(SelectedPen.SelectedStrokeWidth, SelectedPen.SelectedStrokeWidth);
             da.IgnorePressure = true;
             UpdatePreviewInkStroke(da);
-            PreviewInkStrokeCanvas.InkPresenter.StrokeContainer.AddStroke(PreviewInkStroke);            
-        }        
+            PreviewInkStrokeCanvas.InkPresenter.StrokeContainer.AddStroke(PreviewInkStroke);
+        }
         public InkStroke PreviewInkStroke { get; set; }
         public InkStrokeContainer PreviewStrokeContainer { get; set; }
         public void CreatePreviewInkStroke()

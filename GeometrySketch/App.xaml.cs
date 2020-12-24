@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace GeometrySketch
@@ -29,7 +19,7 @@ namespace GeometrySketch
         /// Initialisiert das Singletonanwendungsobjekt. Dies ist die erste Zeile von erstelltem Code
         /// und daher das logische Äquivalent von main() bzw. WinMain().
         /// </summary>        
-        
+
         public App()
         {
             this.InitializeComponent();
@@ -45,7 +35,7 @@ namespace GeometrySketch
                 Title = "Fehlende Berechtigung",
                 Content = "Ihnen fehlt die Berechtigung auf die Datei zuzugreifen, da Sie evtl. verschoben wurde?  Öffnen sie die Skizze stattdessen über den Button 'Öffnen' oder erteilen Sie GeometrySketch unter Datenschutzeinstellungen die entsprechende Berechtigung.",
                 CloseButtonText = "OK",
-                PrimaryButtonText = "Datenschutzeinstellungen"               
+                PrimaryButtonText = "Datenschutzeinstellungen"
             };
             CD_AuthorizationMessage.PrimaryButtonClick += CD_AuthorizationMessage_PrimaryButtonClick;
 

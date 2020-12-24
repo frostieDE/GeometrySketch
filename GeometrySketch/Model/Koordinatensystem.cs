@@ -22,5 +22,5 @@ namespace GeometrySketch.Model
         //lE in Kästchen
         private int _lE;
         public int LE { get => _lE; set { _lE = value; OnPropertyChanged(); } }
-    }    
+    }
 }

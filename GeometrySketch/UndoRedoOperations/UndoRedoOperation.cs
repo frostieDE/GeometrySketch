@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using Windows.UI.Input.Inking;
-using Windows.UI.Xaml.Controls;
+﻿using Windows.UI.Xaml.Controls;
 
 namespace GeometrySketch.UndoRedoOperations
-{    
+{
     public enum UndoRedoOperation
     {
         AddStroke,

@@ -157,7 +157,7 @@ namespace GeometrySketch.Commons
         {
             double m;
 
-            Vector2 vector_a = new Vector2((float)a.X, (float)a.Y);            
+            Vector2 vector_a = new Vector2((float)a.X, (float)a.Y);
             Vector2 vector_v = new Vector2((float)(b.X - a.X), (float)(b.Y - a.Y));
             Vector2 vector_p = new Vector2((float)p.X, (float)p.Y);
             Vector2 vector_pa = new Vector2(vector_p.X - vector_a.X, vector_p.Y - vector_a.Y);
@@ -171,7 +171,7 @@ namespace GeometrySketch.Commons
         {
             Point f = new Point();
 
-            Vector2 vector_a = new Vector2((float)a.X, (float)a.Y);            
+            Vector2 vector_a = new Vector2((float)a.X, (float)a.Y);
             Vector2 vector_v = new Vector2((float)(b.X - a.X), (float)(b.Y - a.Y));
             Vector2 vector_p = new Vector2((float)p.X, (float)p.Y);
             Vector2 vector_pa = new Vector2(vector_p.X - vector_a.X, vector_p.Y - vector_a.Y);

@@ -1,18 +1,15 @@
-﻿using Microsoft.Toolkit.Extensions;
-using System;
-using System.Drawing;
+﻿using System;
 using Windows.UI;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
 
 namespace GeometrySketch.Converter
 {
-    class SolidColorBrushToColor_Converter : IValueConverter        
+    class SolidColorBrushToColor_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            SolidColorBrush scb = new SolidColorBrush((value is Windows.UI.Color) ? (Windows.UI.Color)value : Colors.Black);            
+            SolidColorBrush scb = new SolidColorBrush((value is Windows.UI.Color) ? (Windows.UI.Color)value : Colors.Black);
             return scb;
         }
 

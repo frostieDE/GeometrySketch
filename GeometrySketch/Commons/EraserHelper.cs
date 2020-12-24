@@ -9,7 +9,7 @@ namespace GeometrySketch.Commons
     {
         //Points on Cubic Bezier Curve siehe https://www.cubic.org/docs/bezier.htm
         public static Point lerp(Point a, Point b, float t)
-        {            
+        {
             return new Point()
             {
                 X = a.X + (b.X - a.X) * t,
@@ -22,7 +22,7 @@ namespace GeometrySketch.Commons
             Point bc = new Point();
             Point cd = new Point();
             Point abbc = new Point();
-            Point bccd = new Point();            
+            Point bccd = new Point();
 
             ab = lerp(a, b, t);             // point between a and b
             bc = lerp(b, c, t);             // point between b and c
@@ -35,10 +35,10 @@ namespace GeometrySketch.Commons
         public static List<Point> PointsOnSegment(Point startPt, Point controlPt1, Point controlPt2, Point PositionPt)
         {
             List<Point> points = new List<Point>();
-                        
+
             for (int i = 0; i < 10; i++)
-            {                
-                float t = (float)(i) / 9.0f;               
+            {
+                float t = (float)(i) / 9.0f;
                 points.Add(bezier(startPt, controlPt1, controlPt2, PositionPt, t));
             }
 

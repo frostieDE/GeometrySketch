@@ -1,5 +1,4 @@
 ﻿using GeometrySketch.ViewModels;
-using Windows.UI.Xaml;
 
 namespace GeometrySketch.Views
 {
@@ -10,7 +9,7 @@ namespace GeometrySketch.Views
         public SettingsDialog(MainViewModel viewModel)
         {
             ViewModel = viewModel;
-            this.InitializeComponent();            
+            this.InitializeComponent();
         }
     }
 }

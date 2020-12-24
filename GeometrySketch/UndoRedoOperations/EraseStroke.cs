@@ -6,7 +6,7 @@ namespace GeometrySketch.UndoRedoOperations
 {
     public class EraseStrokeOperation : IUndoRedoOperation
     {
-        public InkStroke ErasedStroke { get; }                
+        public InkStroke ErasedStroke { get; }
 
         public EraseStrokeOperation(InkStroke inkStroke)
         {
@@ -22,9 +22,9 @@ namespace GeometrySketch.UndoRedoOperations
 
         public void Undo(InkCanvas inkCanvas)
         {
-            inkCanvas.InkPresenter.StrokeContainer.AddStroke(ErasedStroke);     
+            inkCanvas.InkPresenter.StrokeContainer.AddStroke(ErasedStroke);
         }
-        
+
         public void Redo(InkCanvas inkCanvas)
         {
             foreach (InkStroke isk in inkCanvas.InkPresenter.StrokeContainer.GetStrokes())
@@ -39,6 +39,6 @@ namespace GeometrySketch.UndoRedoOperations
 
         public UndoRedoOperation GetUndoRedoOperation() => UndoRedoOperation.EraseStroke;
 
-        
+
     }
 }

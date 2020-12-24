@@ -9,7 +9,7 @@ namespace GeometrySketch.Converter
         {
             var b = (Double)value;
             var d = (Decimal)b;
-            d = Math.Round( d / 100,2);
+            d = Math.Round(d / 100, 2);
             return d.ToString();
         }
 

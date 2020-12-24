@@ -1,16 +1,9 @@
 ﻿using GeometrySketch.Model;
-using Microsoft.Toolkit.Uwp.Helpers;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Controls;
 
 namespace GeometrySketch.DataProvider
@@ -35,7 +28,7 @@ namespace GeometrySketch.DataProvider
             {
                 await inkCanvas.InkPresenter.StrokeContainer.LoadAsync(inputStream);
             }
-            stream.Dispose();            
+            stream.Dispose();
         }
         public async Task SaveInkPageAsync(InkCanvas inkCanvas, InkPage inkPage, StorageFile file)
         {
@@ -46,7 +39,7 @@ namespace GeometrySketch.DataProvider
             using (IOutputStream outputStream = stream.GetOutputStreamAt(0))
             {
                 using (var dataWriter = new DataWriter(outputStream))
-                {                    
+                {
                     var json = JsonConvert.SerializeObject(inkPage, Formatting.Indented);
                     dataWriter.WriteString(json);
                     await dataWriter.StoreAsync();
