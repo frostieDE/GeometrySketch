@@ -132,6 +132,7 @@
     <Compile Include="Commons\Constants.cs" />
     <Compile Include="Commons\EraserHelper.cs" />
     <Compile Include="Commons\GeometryHelper.cs" />
+    <Compile Include="Converter\TrueToFalse_Converter.cs" />
     <Compile Include="Converter\BoolToVisibility_Converter.cs" />
     <Compile Include="Converter\EraserWidthToRectangle_Converter.cs" />
     <Compile Include="Converter\RadiusToLE_Converter.cs" />
@@ -160,6 +161,9 @@
     </Compile>
     <Compile Include="Views\AddKoordinatensystemDialog.xaml.cs">
       <DependentUpon>AddKoordinatensystemDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FirstStartDialog.xaml.cs">
+      <DependentUpon>FirstStartDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -262,6 +266,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AddKoordinatensystemDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\FirstStartDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

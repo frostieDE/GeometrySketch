@@ -77,6 +77,8 @@ namespace GeometrySketch.ViewModels
             {
                 Settings.Theme = 3;
             }
+
+            Settings.FirstStartOnBuild1_2_1 = FirstStartOnBuild;
         }
         public void UpdateViewModelSettings()
         {
@@ -96,6 +98,8 @@ namespace GeometrySketch.ViewModels
                     CurrentTheme = ElementTheme.Default;
                     break;
             }
+
+            FirstStartOnBuild = Settings.FirstStartOnBuild1_2_1;
         }
 
         public MainViewModel(IInkPageDataprovider inkPageDataProvider, ISettingsDataProvider settingsDataProvider, InkCanvas inkCanvas, Rectangle rectangle)
@@ -147,6 +151,7 @@ namespace GeometrySketch.ViewModels
         }
 
         public bool SaveNecessity { get; set; } = false;
+        public bool FirstStartOnBuild { get; set; } = false;
 
         public async Task AutoLoadAsync()
         {

@@ -1,0 +1,24 @@
+﻿<ContentDialog 
+    x:Class="GeometrySketch.Views.FirstStartDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Converter="using:GeometrySketch.Converter"    
+    mc:Ignorable="d"    
+    Title="Aktuelles vom Entwickler"        
+    CloseButtonText="OK"    
+    RequestedTheme="{x:Bind ViewModel.CurrentTheme,Mode=TwoWay}">
+    <ContentDialog.Resources>
+        <Converter:TrueToFalse_Converter x:Key="TrueToFalse_Converter"/>
+    </ContentDialog.Resources>
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Text="Gefällt Ihnen diese App?" TextWrapping="WrapWholeWords" FontSize="16"/>
+            <HyperlinkButton Content="Bewertung abgeben" NavigateUri="ms-windows-store://review/?productid=9NKTD2J3H6N4" Margin="10,0,0,0"/>
+            <TextBlock Text="Haben Sie Probleme, oder wünschen Sie Sich weitere Funktionen?" TextWrapping="WrapWholeWords" FontSize="16" Margin="0,15,0,0"/>            
+            <HyperlinkButton Content="Feedback" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
+            <CheckBox x:Name="CheckBox_ShowNot" HorizontalAlignment="Right" Content="Dialog nicht mehr anzeigen?" IsThreeState="False" IsChecked="{x:Bind ViewModel.FirstStartOnBuild, Mode=TwoWay, Converter={StaticResource TrueToFalse_Converter}}"/>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

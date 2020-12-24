@@ -92,12 +92,17 @@ namespace GeometrySketch
         }
 
 
-
         //AppLifeCycle and DataEvents
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             await ViewModel.AutoLoadAsync();
             ScrollViewer_InkCanvas.ChangeView(null, null, 0.5f, true);
+
+            FirstStartDialog firstStartDialog = new FirstStartDialog(ViewModel);
+            if (ViewModel.FirstStartOnBuild == true)
+            {
+                await firstStartDialog.ShowAsync();
+            }   
         }
         private async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
