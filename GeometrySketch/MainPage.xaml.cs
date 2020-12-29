@@ -505,7 +505,6 @@ namespace GeometrySketch
                     ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel + 1;
                 }
 
-                //ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta / 120;
 
                 Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
 
