@@ -102,7 +102,7 @@ namespace GeometrySketch
             if (ViewModel.FirstStartOnBuild == true)
             {
                 await firstStartDialog.ShowAsync();
-            }   
+            }
         }
         private async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
@@ -300,7 +300,7 @@ namespace GeometrySketch
                 ViewModel.SelectedConstructionToolsIndex = 2;
 
                 //Reset Geodreieck Position                
-                ViewModel.GeodreieckDZ = new Point(800,799);
+                ViewModel.GeodreieckDZ = new Point(800, 799);
                 ViewModel.GeodreieckAngle = 0;
                 Geodreieck_TranslateTransform.Y = 0;
                 Geodreieck_TranslateTransform.X = 0;
@@ -435,11 +435,11 @@ namespace GeometrySketch
 
             Geodreieck_TranslateTransform.X = Geodreieck_TranslateTransform.X + x;
             Geodreieck_TranslateTransform.Y = Geodreieck_TranslateTransform.Y + y;
-            
-            Point p = new Point(ViewModel.GeodreieckDZ.X + x, ViewModel.GeodreieckDZ.Y + y);
-            ViewModel.GeodreieckDZ = p;           
 
-            ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + dw;                        
+            Point p = new Point(ViewModel.GeodreieckDZ.X + x, ViewModel.GeodreieckDZ.Y + y);
+            ViewModel.GeodreieckDZ = p;
+
+            ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + dw;
 
             //Bindung an Koordinatenachsen
             if (-0.5 <= ViewModel.GeodreieckAngle && ViewModel.GeodreieckAngle <= 0.5)
@@ -461,7 +461,7 @@ namespace GeometrySketch
             else if (359.5 <= ViewModel.GeodreieckAngle)
             {
                 ViewModel.GeodreieckAngle = 0;
-            }      
+            }
         }
         private void Geodreieck_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
@@ -491,7 +491,7 @@ namespace GeometrySketch
                 else
                 {
                     ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + 1;
-                }                
+                }
 
                 ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
                 ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
@@ -504,7 +504,7 @@ namespace GeometrySketch
                 ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
             }
         }
-        
+
         //Enables MouseInput and Scroll-Ability by Touch        
         private void InkCanvas_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
