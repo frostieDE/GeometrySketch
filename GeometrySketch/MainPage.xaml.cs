@@ -494,32 +494,34 @@ namespace GeometrySketch
         }
         private void Geodreieck_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            try
+            if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
             {
-                if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
+                if (e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta > 0)
                 {
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta / 120;
-
-                    Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
-
-                    Geodreieck_RotateTransform.CenterX = _dz.X;
-                    Geodreieck_RotateTransform.CenterY = _dz.Y;
-                    Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
-
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
+                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - 1;
                 }
                 else
                 {
-                    ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
-                    ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
+                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel + 1;
                 }
-            }
-            catch
-            {
 
+                //ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta / 120;
+
+                Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
+
+                Geodreieck_RotateTransform.CenterX = _dz.X;
+                Geodreieck_RotateTransform.CenterY = _dz.Y;
+                Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
+
+                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
+                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
+                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
+            }
+            else
+            {
+                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Enabled;
+                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
+                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
             }
         }
         private void Slider_GeodreieckAngel_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
