@@ -9,14 +9,16 @@ namespace GeometrySketch.Converter
         {
             var sv = (double)value;
             sv = Math.Round(sv, 0);
-            if (sv == 360)
+            /*if (sv == 360)
             {
                 return "0";
             }
             else
             {
                 return sv.ToString();
-            }
+            }*/
+
+            return sv.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

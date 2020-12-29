@@ -34,7 +34,7 @@
             </StackPanel>
             <TextBlock Text="Über diese Anwendung" Margin="0,30,0,0" FontSize="16"/>
             <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
-                <TextBlock Text="Version 1.2.1 entwickelt von" VerticalAlignment="Center"/>
+                <TextBlock Text="Version 1.2.3 entwickelt von" VerticalAlignment="Center"/>
                 <HyperlinkButton Content="Hubert Heinz" NavigateUri="mailto:geometrysketch@outlook.de" Margin="10,0,0,0"/>
             </StackPanel>
             <HyperlinkButton Content="Quellcode" NavigateUri="https://github.com/HuHe86/GeometrySketch" Margin="10,0,0,0"/>
