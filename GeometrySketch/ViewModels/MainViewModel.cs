@@ -602,13 +602,14 @@ namespace GeometrySketch.ViewModels
         public Visibility ConstructionToolsDetailsVisibility { get { if (SelectedConstructionToolsIndex != 0) { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
 
         //GeodreieckProperties
-        private double _geodreieckDrehwinkel;
-        public double GeodreieckDrehwinkel { get { return _geodreieckDrehwinkel; } set { if (value > 360) { _geodreieckDrehwinkel = value - 360; } else if (value < 0) { _geodreieckDrehwinkel = value + 360; } else { _geodreieckDrehwinkel = value; }; OnPropertyChanged(); } }
+        private Point _geodreieckDZ = new Point(800, 799);
+        public Point GeodreieckDZ { get { return _geodreieckDZ; } set { _geodreieckDZ = value; OnPropertyChanged(); } }
+        private double _geodreieckAngle;
+        public double GeodreieckAngle { get { return _geodreieckAngle; } set { if (value > 360) { _geodreieckAngle = value - 360; } else if (value < 0) { _geodreieckAngle = value + 360; } else { _geodreieckAngle = value; }; OnPropertyChanged(); } }
+        
         private Visibility _geodreieckVisibilty = Visibility.Collapsed;
-        public Visibility GeodreieckVisibilty { get => _geodreieckVisibilty; set { _geodreieckVisibilty = value; OnPropertyChanged(); } }
-
-        private Point _geodreieck_Dz = new Point(800, 799);
-        public Point Geodreieck_Dz { get { return _geodreieck_Dz; } set { _geodreieck_Dz = value; } }
+        public Visibility GeodreieckVisibility { get => _geodreieckVisibilty; set { _geodreieckVisibilty = value; OnPropertyChanged(); } }
+        
         //Points Geodreieck
         /*
         public Point Geodreieck_P1

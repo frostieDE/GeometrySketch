@@ -299,14 +299,13 @@ namespace GeometrySketch
                 ViewModel.SelectedConstructionTool = "Geodreieck";
                 ViewModel.SelectedConstructionToolsIndex = 2;
 
-                //Reset Geodreieck Position
-                _dz.X = 800;
-                _dz.Y = 799;
-                ViewModel.GeodreieckDrehwinkel = 0;
+                //Reset Geodreieck Position                
+                ViewModel.GeodreieckDZ = new Point(800,799);
+                ViewModel.GeodreieckAngle = 0;
                 Geodreieck_TranslateTransform.Y = 0;
                 Geodreieck_TranslateTransform.X = 0;
                 Geodreieck_RotateTransform.Angle = 0;
-                ViewModel.GeodreieckVisibilty = Visibility.Visible;
+                ViewModel.GeodreieckVisibility = Visibility.Visible;
 
                 coreInkIndependentInputSource.PointerHovering += coreInkIndependentInputSource_PointerHovering;
                 Geodreieck.PointerMoved += Geodreieck_PointerMoved;
@@ -388,17 +387,15 @@ namespace GeometrySketch
                 ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
             }
         }
-        //Geodreieck DeltaManipulation
-        private Point _dz = new Point(800, 799);
-        public Point DZ { get { return _dz; } set { _dz = value; } }
+        //Geodreieck DeltaManipulation        
         public Point P1
         {
             get
             {
                 Point p = new Point()
                 {
-                    X = _dz.X + Math.Cos((180 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800,
-                    Y = _dz.Y - Math.Sin((180 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800
+                    X = ViewModel.GeodreieckDZ.X + Math.Cos((180 - ViewModel.GeodreieckAngle) / 180 * Math.PI) * 800,
+                    Y = ViewModel.GeodreieckDZ.Y - Math.Sin((180 - ViewModel.GeodreieckAngle) / 180 * Math.PI) * 800
                 };
                 return p;
             }
@@ -409,8 +406,8 @@ namespace GeometrySketch
             {
                 Point p = new Point()
                 {
-                    X = _dz.X + Math.Cos((-ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800,
-                    Y = _dz.Y - Math.Sin((-ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 800
+                    X = ViewModel.GeodreieckDZ.X + Math.Cos((-ViewModel.GeodreieckAngle) / 180 * Math.PI) * 800,
+                    Y = ViewModel.GeodreieckDZ.Y - Math.Sin((-ViewModel.GeodreieckAngle) / 180 * Math.PI) * 800
                 };
                 return p;
             }
@@ -421,8 +418,8 @@ namespace GeometrySketch
             {
                 Point p = new Point()
                 {
-                    X = _dz.X + Math.Cos((90 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 799,
-                    Y = _dz.Y - Math.Sin((90 - ViewModel.GeodreieckDrehwinkel) / 180 * Math.PI) * 799
+                    X = ViewModel.GeodreieckDZ.X + Math.Cos((90 - ViewModel.GeodreieckAngle) / 180 * Math.PI) * 799,
+                    Y = ViewModel.GeodreieckDZ.Y - Math.Sin((90 - ViewModel.GeodreieckAngle) / 180 * Math.PI) * 799
                 };
                 return p;
             }
@@ -438,42 +435,33 @@ namespace GeometrySketch
 
             Geodreieck_TranslateTransform.X = Geodreieck_TranslateTransform.X + x;
             Geodreieck_TranslateTransform.Y = Geodreieck_TranslateTransform.Y + y;
+            
+            Point p = new Point(ViewModel.GeodreieckDZ.X + x, ViewModel.GeodreieckDZ.Y + y);
+            ViewModel.GeodreieckDZ = p;           
 
-            _dz.X = _dz.X + x;
-            _dz.Y = _dz.Y + y;
-
-            ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel + dw;
-            if (ViewModel.GeodreieckDrehwinkel >= 360)
-            {
-                ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - 360;
-            }
+            ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + dw;                        
 
             //Bindung an Koordinatenachsen
-            if (-0.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 0.5)
+            if (-0.5 <= ViewModel.GeodreieckAngle && ViewModel.GeodreieckAngle <= 0.5)
             {
-                ViewModel.GeodreieckDrehwinkel = 0;
+                ViewModel.GeodreieckAngle = 0;
             }
-            else if (89.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 90.5)
+            else if (89.5 <= ViewModel.GeodreieckAngle && ViewModel.GeodreieckAngle <= 90.5)
             {
-                ViewModel.GeodreieckDrehwinkel = 90;
+                ViewModel.GeodreieckAngle = 90;
             }
-            else if (179.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 180.5)
+            else if (179.5 <= ViewModel.GeodreieckAngle && ViewModel.GeodreieckAngle <= 180.5)
             {
-                ViewModel.GeodreieckDrehwinkel = 180;
+                ViewModel.GeodreieckAngle = 180;
             }
-            else if (269.5 <= ViewModel.GeodreieckDrehwinkel && ViewModel.GeodreieckDrehwinkel <= 270.5)
+            else if (269.5 <= ViewModel.GeodreieckAngle && ViewModel.GeodreieckAngle <= 270.5)
             {
-                ViewModel.GeodreieckDrehwinkel = 270;
+                ViewModel.GeodreieckAngle = 270;
             }
-            else if (359.5 <= ViewModel.GeodreieckDrehwinkel)
+            else if (359.5 <= ViewModel.GeodreieckAngle)
             {
-                ViewModel.GeodreieckDrehwinkel = 0;
-            }
-            Slider_GeodreieckAngel.Value = Math.Round(360 - ViewModel.GeodreieckDrehwinkel, 0);
-
-            Geodreieck_RotateTransform.CenterX = _dz.X;
-            Geodreieck_RotateTransform.CenterY = _dz.Y;
-            Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
+                ViewModel.GeodreieckAngle = 0;
+            }      
         }
         private void Geodreieck_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
@@ -498,19 +486,12 @@ namespace GeometrySketch
             {
                 if (e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta > 0)
                 {
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel - 1;
+                    ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle - 1;
                 }
                 else
                 {
-                    ViewModel.GeodreieckDrehwinkel = ViewModel.GeodreieckDrehwinkel + 1;
-                }
-
-
-                Slider_GeodreieckAngel.Value = 360 - ViewModel.GeodreieckDrehwinkel;
-
-                Geodreieck_RotateTransform.CenterX = _dz.X;
-                Geodreieck_RotateTransform.CenterY = _dz.Y;
-                Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
+                    ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + 1;
+                }                
 
                 ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
                 ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
@@ -523,14 +504,7 @@ namespace GeometrySketch
                 ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
             }
         }
-        private void Slider_GeodreieckAngel_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-        {
-            ViewModel.GeodreieckDrehwinkel = 360 - e.NewValue;
-
-            Geodreieck_RotateTransform.CenterX = _dz.X;
-            Geodreieck_RotateTransform.CenterY = _dz.Y;
-            Geodreieck_RotateTransform.Angle = ViewModel.GeodreieckDrehwinkel;
-        }
+        
         //Enables MouseInput and Scroll-Ability by Touch        
         private void InkCanvas_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
@@ -540,7 +514,7 @@ namespace GeometrySketch
                 Y = e.Position.Y,
             };
 
-            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && ViewModel.GeodreieckVisibilty == Visibility.Visible)
+            if (GeometryHelper.PointIsInPolygon(P1, P2, P3, p) == true && e.IsInertial == false && ViewModel.GeodreieckVisibility == Visibility.Visible)
             {
                 Geodreieck_ManipulationDelta(sender, e);
             }

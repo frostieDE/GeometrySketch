@@ -16,7 +16,9 @@
         <Converter:BoolToVisibility_Converter x:Key="BoolToVisibility_Converter"/>
         <Converter:VisibilityToBool_Converter x:Key="VisibilityToBool_Converter"/>
         <Converter:RadiusToLE_Converter x:Key="RadiusToLE_Converter"/>
-        <Converter:EraserWidthToRectangle_Converter x:Key="EraserWidthToRectangle_Converter"/>        
+        <Converter:EraserWidthToRectangle_Converter x:Key="EraserWidthToRectangle_Converter"/>
+        <Converter:AngleToSliderValue_Converter x:Key="AngleToSliderValue_Converter"/>
+        <Converter:SliderValueToRoundedString_Converter x:Key="SliderValueToRoundedString_Converter"/>
     </Page.Resources>
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
@@ -102,7 +104,7 @@
                     </InkToolbarCustomToggleButton>                    
                 </AppBarElementContainer>                
                 <AppBarElementContainer>
-                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Geodreieck" ToolTipService.ToolTip="Geodreieck" IsChecked="{x:Bind ViewModel.GeodreieckVisibilty, Mode=TwoWay, Converter={StaticResource VisibilityToBool_Converter}}" Checked="ConstructionTools_Checked" Unchecked="ConstructionTools_Unchecked">
+                    <InkToolbarCustomToggleButton x:Name="ITBCTB_Geodreieck" ToolTipService.ToolTip="Geodreieck" IsChecked="{x:Bind ViewModel.GeodreieckVisibility, Mode=TwoWay, Converter={StaticResource VisibilityToBool_Converter}}" Checked="ConstructionTools_Checked" Unchecked="ConstructionTools_Unchecked">
                         <Image Source="{ThemeResource Icon_Geodreieck}" Height="26"/>
                     </InkToolbarCustomToggleButton>
                 </AppBarElementContainer>
@@ -221,7 +223,7 @@
                             <Image.RenderTransform>
                                 <TransformGroup>
                                     <TranslateTransform x:Name="Geodreieck_TranslateTransform"/>
-                                    <RotateTransform x:Name="Geodreieck_RotateTransform"/>
+                                    <RotateTransform x:Name="Geodreieck_RotateTransform" CenterX="{x:Bind ViewModel.GeodreieckDZ.X,Mode=OneWay}" CenterY="{x:Bind ViewModel.GeodreieckDZ.Y,Mode=OneWay}" Angle="{x:Bind ViewModel.GeodreieckAngle,Mode=OneWay}"/>
                                 </TransformGroup>
                             </Image.RenderTransform>
                         </Image>                        
@@ -272,10 +274,10 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Drehwinkel" VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Bind Slider_GeodreieckAngel.Value, Mode=OneWay}" Margin="30,0,0,0"/>
+                                <TextBlock Text="{x:Bind Slider_GeodreieckAngle.Value, Mode=OneWay, Converter={StaticResource SliderValueToRoundedString_Converter}}" Margin="30,0,0,0"/>
                                 <TextBlock Text="°"/>
                             </StackPanel>
-                            <Slider x:Name="Slider_GeodreieckAngel" IsThumbToolTipEnabled="False" Value="0" TickPlacement="BottomRight" TickFrequency="45" SmallChange="1" Minimum="0" Maximum="360" ValueChanged="Slider_GeodreieckAngel_ValueChanged" Margin="0,0,10,0"/>
+                            <Slider x:Name="Slider_GeodreieckAngle" IsThumbToolTipEnabled="False" Value="{x:Bind ViewModel.GeodreieckAngle,Mode=TwoWay, Converter={StaticResource AngleToSliderValue_Converter}}" TickPlacement="BottomRight" TickFrequency="45" SmallChange="1" Minimum="0" Maximum="360" Margin="0,0,10,0"/>
                         </StackPanel>
                     </Grid>
                     <Grid x:Name="Grid_ZirkelDetail" Grid.Row="1" Visibility="{x:Bind ITBCTB_Zirkel.IsChecked, Converter={StaticResource BoolToVisibility_Converter}, Mode=OneWay}">
