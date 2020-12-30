@@ -604,8 +604,8 @@ namespace GeometrySketch.ViewModels
         //GeodreieckProperties
         private Point _geodreieckDZ = new Point(800, 799);
         public Point GeodreieckDZ { get { return _geodreieckDZ; } set { _geodreieckDZ = value; OnPropertyChanged(); } }
-        private double _geodreieckAngle;
-        public double GeodreieckAngle { get { return _geodreieckAngle; } set { if (value > 360) { _geodreieckAngle = value - 360; } else if (value <= 0) { _geodreieckAngle = value + 360; } else { _geodreieckAngle = value; }; OnPropertyChanged(); } }
+        private double _geodreieckAngle = 0;
+        public double GeodreieckAngle { get { return _geodreieckAngle; } set {_geodreieckAngle = value; OnPropertyChanged(); } }
         
         private Visibility _geodreieckVisibilty = Visibility.Collapsed;
         public Visibility GeodreieckVisibility { get => _geodreieckVisibilty; set { _geodreieckVisibilty = value; OnPropertyChanged(); } }

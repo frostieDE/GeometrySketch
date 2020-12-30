@@ -132,8 +132,9 @@
     <Compile Include="Commons\Constants.cs" />
     <Compile Include="Commons\EraserHelper.cs" />
     <Compile Include="Commons\GeometryHelper.cs" />
+    <Compile Include="Converter\AngleToNegativeMathAngle_Converter.cs" />
     <Compile Include="Converter\AngleToSliderValue_Converter.cs" />
-    <Compile Include="Converter\SliderValueToRoundedString_Converter.cs" />
+    <Compile Include="Converter\AngleToMathAngle_Converter.cs" />
     <Compile Include="Converter\TrueToFalse_Converter.cs" />
     <Compile Include="Converter\BoolToVisibility_Converter.cs" />
     <Compile Include="Converter\EraserWidthToRectangle_Converter.cs" />

@@ -3,7 +3,7 @@ using Windows.UI.Xaml.Data;
 
 namespace GeometrySketch.Converter
 {
-    public class AngleToSliderValue_Converter : IValueConverter
+    public class AngleToNegativeMathAngle_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -12,14 +12,14 @@ namespace GeometrySketch.Converter
 
             if (b > 0)
             {
-                b = Math.Round(360 - b, 0);
-                return b;
+                b = Math.Round(-b, 0);
+                return b.ToString();
             }
 
             else
             {
-                b = Math.Round(-b, 0);
-                return b;
+                b = Math.Round(-360-b, 0);
+                return b.ToString();
             }
         }
 

@@ -89,6 +89,8 @@ namespace GeometrySketch
 
             InkCanvas_GeometrySketch.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
             InkCanvas_GeometrySketch.InkPresenter.UnprocessedInput.PointerEntered += UnprocessedInput_PointerEntered;
+
+            
         }
 
 
@@ -484,6 +486,10 @@ namespace GeometrySketch
         {
             if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down) == false)
             {
+                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
+                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
+                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
+
                 if (e.GetCurrentPoint(Grid_InkCanvas).Properties.MouseWheelDelta > 0)
                 {
                     ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle - 1;
@@ -492,10 +498,6 @@ namespace GeometrySketch
                 {
                     ViewModel.GeodreieckAngle = ViewModel.GeodreieckAngle + 1;
                 }
-
-                ScrollViewer_InkCanvas.VerticalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Disabled;
-                ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Disabled;
             }
             else
             {
@@ -503,6 +505,7 @@ namespace GeometrySketch
                 ScrollViewer_InkCanvas.HorizontalScrollMode = ScrollMode.Enabled;
                 ScrollViewer_InkCanvas.ZoomMode = ZoomMode.Enabled;
             }
+            
         }
 
         //Enables MouseInput and Scroll-Ability by Touch        
@@ -535,7 +538,7 @@ namespace GeometrySketch
                 }
                 ScaleFactor = ScrollViewer_InkCanvas.ZoomFactor;
             }
-        }
+        }        
 
         //Snap to Geodreieck
         private bool Snap { get; set; }
@@ -962,6 +965,6 @@ namespace GeometrySketch
         {
             settingsDialog = new Views.SettingsDialog(ViewModel);
             await settingsDialog.ShowAsync();
-        }
+        }        
     }
 }
